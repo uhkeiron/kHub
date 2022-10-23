@@ -83,3 +83,5 @@ GUIManager = {} do
         end
     end
 end
+
+return GUIManager
