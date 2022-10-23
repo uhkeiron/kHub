@@ -207,200 +207,6 @@ ESPManager = {} do
             self.Library = library
         end
 
-        function ESPManager:CreateESPManager(Tab)
-            assert(self.Library, "You must set ESPManager.Library first before doing this")
-
-            local Groupboxes = {
-                MainBox = Tab:AddLeftGroupbox("Main"),
-                ESPTypes1 = {
-                    Tabbox = Tab:AddLeftTabbox()
-                },
-                ESPTypes2 = {
-                    Tabbox = Tab:AddRightTabbox()
-                }
-            }
-            Groupboxes.ESPTypes1.BoxesBox = Groupboxes.ESPTypes1.Tabbox:AddTab("Boxes")
-            Groupboxes.ESPTypes1.ChamsBox = Groupboxes.ESPTypes1.Tabbox:AddTab("Chams")
-            Groupboxes.ESPTypes1.TextsBox = Groupboxes.ESPTypes1.Tabbox:AddTab("Texts")
-            Groupboxes.ESPTypes2.TracersBox = Groupboxes.ESPTypes2.Tabbox:AddTab("Tracers")
-            Groupboxes.ESPTypes2.ArrowsBox = Groupboxes.ESPTypes2.Tabbox:AddTab("Arrows")
-            Groupboxes.ESPTypes2.DotsBox = Groupboxes.ESPTypes2.Tabbox:AddTab("Dots")
-
-            local function AssignToggle(index, settingDirectories, func)
-                func = func or function() end
-
-                if (#settingDirectories == 1) then
-                    Toggles[index]:OnChanged(function()
-                        Settings[settingDirectories[1]] = Toggles[index].Value
-                        func()
-                    end)
-                elseif (#settingDirectories == 2) then
-                    Toggles[index]:OnChanged(function()
-                        Settings[settingDirectories[1]][settingDirectories[2]] = Toggles[index].Value
-                        func()
-                    end)
-                end
-            end
-
-            local function AssignOptions(index, settingDirectories, func)
-                func = func or function() end
-
-                if (#settingDirectories == 1) then
-                    Options[index]:OnChanged(function()
-                        Settings[settingDirectories[1]] = Options[index].Value
-                        func()
-                    end)
-                elseif (#settingDirectories == 2) then
-                    Options[index]:OnChanged(function()
-                        Settings[settingDirectories[1]][settingDirectories[2]] = Options[index].Value
-                        func()
-                    end)
-                end
-            end
-
-            -- Main Groupbox
-            do
-                local Groupbox = Groupboxes.MainBox
-
-                Groupbox:AddDivider()
-                
-                Groupbox:AddToggle("Settings.Enabled", {
-                    Text = "ESP Enabled",
-                    Default = Settings.Enabled,
-                    Tooltip = "Enable it to enable ESP."
-                }):AddKeyPicker("Settings.EnableKeybind", {
-                    Text = "ESP Enable Keybind",
-                    Default = Settings.EnableKeybind,
-                    Mode = "Toggle",
-                    SyncToggleState = true,
-                    NoUI = false
-                })
-                Groupbox:AddSlider("Settings.MaxDrawDistance", {
-                    Text = "Max Draw Distance",
-                    Default = Settings.MaxDrawDistance,
-                    Min = 100,
-                    Max = 25000,
-                    Rounding = 0,
-                    Compact = false
-                })
-                Groupbox:AddSlider("Settings.RefreshRate", {
-                    Text = "Refresh Rate",
-                    Default = Settings.RefreshRate,
-                    Min = 1,
-                    Max = 200,
-                    Rounding = 0,
-                    Compact = false
-                })
-
-                Groupbox:AddDivider()
-
-                Groupbox:AddToggle("Settings.TeamColor", {
-                    Text = "Team Color",
-                    Default = Settings.TeamColor,
-                    Tooltip = "Enable it to set players their team color."
-                })
-                Groupbox:AddToggle("Settings.TeamCheck", {
-                    Text = "Team Check",
-                    Default = Settings.TeamCheck,
-                    Tooltip = "Enable it to make teammates color to green and enemies color to red."
-                })
-                Groupbox:AddToggle("Settings.VisibleCheck", {
-                    Text = "Visible Check",
-                    Default = Settings.VisibleCheck,
-                    Tooltip = "Enable it to"
-                })
-                
-                do
-                    AssignToggle("Settings.Enabled", {"Enabled"})
-                    --AssignOptions("Settings.EnableKeybind", {"EnableKeybind"})
-                    AssignOptions("Settings.MaxDrawDistance", {"MaxDrawDistance"})
-                    AssignOptions("Settings.RefreshRate", {"RefreshRate"})
-                    AssignToggle("Settings.TeamColor", {"TeamColor"}, function()
-                        if (Toggles["Settings.TeamCheck"].Value) then
-                            Toggles["Settings.TeamCheck"]:SetValue(false)
-                        end
-                    end)
-                    AssignToggle("Settings.TeamCheck", {"TeamCheck"}, function()
-                        if (Toggles["Settings.TeamColor"].Value) then
-                            Toggles["Settings.TeamColor"]:SetValue(false)
-                        end
-                    end)
-                    AssignToggle("Settings.VisibleCheck", {"VisibleCheck"})
-                end
-            end
-
-            -- Boxes Groupbox
-            do
-                local Groupbox = Groupboxes.ESPTypes1.BoxesBox
-
-                Groupbox:AddDivider()
-
-                Groupbox:AddToggle("Settings.Boxes.Show", {
-                    Text = "Show Boxes",
-                    Default = Settings.Boxes.Show,
-                    Tooltip = "Enable it to show boxes type esp."
-                })
-                Groupbox:AddDropdown("Settings.Boxes.Mode", {
-                    Text = "Drawing Mode",
-                    Default = Settings.Boxes.Mode,
-                    Values = {"Dynamic", "Static"},
-                    Multi = false,
-                    Tooltip = "Dynamic for dynamic box type or Static for static box type."
-                })
-                Groupbox:AddLabel("Fill Color"):AddColorPicker("Settings.Boxes.FillColor", {
-                    Title = "Box Fill Color Picker",
-                    Default = Settings.Boxes.FillColor
-                })
-                Groupbox:AddSlider("Settings.Boxes.FillThickness", {
-                    Text = "Fill Thickness",
-                    Default = Settings.Boxes.FillThickness,
-                    Min = 1,
-                    Max = 5,
-                    Rounding = 1,
-                    Compact = false
-                })
-                Groupbox:AddSlider("Settings.Boxes.FillTransparency", {
-                    Text = "Fill Transparency",
-                    Default  = Settings.Boxes.FillTransparency,
-                    Min = 0,
-                    Max = 1,
-                    Rounding = 2,
-                    Compact = false
-                })
-                Groupbox:AddLabel("Outline Color"):AddColorPicker("Settings.Boxes.OutlineColor", {
-                    Title = "Box Outline Color Picker",
-                    Default = Settings.Boxes.OutlineColor
-                })
-                Groupbox:AddSlider("Settings.Boxes.OutlineThickness", {
-                    Text = "Outline Thickness",
-                    Default = Settings.Boxes.OutlineThickness,
-                    Min = 1,
-                    Max = 5,
-                    Rounding = 1,
-                    Compact = false
-                })
-                Groupbox:AddSlider("Settings.Boxes.OutlineTransparency", {
-                    Text = "Outline Transparency",
-                    Default  = Settings.Boxes.OutlineTransparency,
-                    Min = 0,
-                    Max = .2,
-                    Rounding = 2,
-                    Compact = false
-                })
-
-                do
-                    AssignToggle("Settings.Boxes.Show", {"Boxes", "Show"})
-                    AssignOptions("Settings.Boxes.Mode", {"Boxes", "Mode"})
-                    AssignOptions("Settings.Boxes.FillColor", {"Boxes", "FillColor"})
-                    AssignOptions("Settings.Boxes.FillThickness", {"Boxes", "FillThickness"})
-                    AssignOptions("Settings.Boxes.FillTransparency", {"Boxes", "FillTransparency"})
-                    AssignOptions("Settings.Boxes.OutlineColor", {"Boxes", "OutlineColor"})
-                    AssignOptions("Settings.Boxes.OutlineThickness", {"Boxes", "OutlineThickness"})
-                    AssignOptions("Settings.Boxes.OutlineTransparency", {"Boxes", "OutlineTransparency"})
-                end
-            end
-        end
-
         function ESPManager:CreateStaticBox()
             local Box = {}
 
@@ -612,7 +418,7 @@ ESPManager = {} do
                 for _, player in pairs(PlayersService:GetPlayers()) do
                     local data = ESPManager.InstanceData[player.Name] or {Instances = {}}
 
-                    data.Instances["Box"] = data.Instances["Box"] or ESPManager:CreateStaticBox()
+                    data.Instances["Box"] = data.Instances["Box"] or (if (ESPManager.Settings.Boxes.Mode == 1) then print("DynamicBox") else ESPManager:CreateStaticBox())
 
                     local Box = data.Instances["Box"]
 
@@ -713,20 +519,210 @@ ESPManager = {} do
             RunService:BindToRenderStep(GetDataName, 300, ESPManager.UpdatePlayerData)
             RunService:BindToRenderStep(UpdateNmae, 199, ESPManager.Update)
         end
+
+        function ESPManager:CreateESPManager(Tab)
+            assert(self.Library, "You must set ESPManager.Library first before doing this")
+
+            local Groupboxes = {
+                MainBox = Tab:AddLeftGroupbox("Main"),
+                ESPTypes1 = {
+                    Tabbox = Tab:AddLeftTabbox()
+                },
+                ESPTypes2 = {
+                    Tabbox = Tab:AddRightTabbox()
+                }
+            }
+            Groupboxes.ESPTypes1.BoxesBox = Groupboxes.ESPTypes1.Tabbox:AddTab("Boxes")
+            Groupboxes.ESPTypes1.ChamsBox = Groupboxes.ESPTypes1.Tabbox:AddTab("Chams")
+            Groupboxes.ESPTypes1.TextsBox = Groupboxes.ESPTypes1.Tabbox:AddTab("Texts")
+            Groupboxes.ESPTypes2.TracersBox = Groupboxes.ESPTypes2.Tabbox:AddTab("Tracers")
+            Groupboxes.ESPTypes2.ArrowsBox = Groupboxes.ESPTypes2.Tabbox:AddTab("Arrows")
+            Groupboxes.ESPTypes2.DotsBox = Groupboxes.ESPTypes2.Tabbox:AddTab("Dots")
+
+            local function AssignToggle(index, settingDirectories, func)
+                func = func or function() end
+
+                if (#settingDirectories == 1) then
+                    Toggles[index]:OnChanged(function()
+                        Settings[settingDirectories[1]] = Toggles[index].Value
+                        func()
+                    end)
+                elseif (#settingDirectories == 2) then
+                    Toggles[index]:OnChanged(function()
+                        Settings[settingDirectories[1]][settingDirectories[2]] = Toggles[index].Value
+                        func()
+                    end)
+                end
+            end
+
+            local function AssignOptions(index, settingDirectories, func)
+                func = func or function() end
+
+                if (#settingDirectories == 1) then
+                    Options[index]:OnChanged(function()
+                        Settings[settingDirectories[1]] = Options[index].Value
+                        func()
+                    end)
+                elseif (#settingDirectories == 2) then
+                    Options[index]:OnChanged(function()
+                        Settings[settingDirectories[1]][settingDirectories[2]] = Options[index].Value
+                        func()
+                    end)
+                end
+            end
+
+            -- Main Groupbox
+            do
+                local Groupbox = Groupboxes.MainBox
+
+                Groupbox:AddDivider()
+                
+                Groupbox:AddToggle("Settings.Enabled", {
+                    Text = "ESP Enabled",
+                    Default = Settings.Enabled,
+                    Tooltip = "Enable it to enable ESP."
+                }):AddKeyPicker("Settings.EnableKeybind", {
+                    Text = "ESP Enable Keybind",
+                    Default = Settings.EnableKeybind,
+                    Mode = "Toggle",
+                    SyncToggleState = true,
+                    NoUI = false
+                })
+                Groupbox:AddSlider("Settings.MaxDrawDistance", {
+                    Text = "Max Draw Distance",
+                    Default = Settings.MaxDrawDistance,
+                    Min = 100,
+                    Max = 25000,
+                    Rounding = 0,
+                    Compact = false
+                })
+                Groupbox:AddSlider("Settings.RefreshRate", {
+                    Text = "Refresh Rate",
+                    Default = Settings.RefreshRate,
+                    Min = 1,
+                    Max = 200,
+                    Rounding = 0,
+                    Compact = false
+                })
+
+                Groupbox:AddDivider()
+
+                Groupbox:AddToggle("Settings.TeamColor", {
+                    Text = "Team Color",
+                    Default = Settings.TeamColor,
+                    Tooltip = "Enable it to set players their team color."
+                })
+                Groupbox:AddToggle("Settings.TeamCheck", {
+                    Text = "Team Check",
+                    Default = Settings.TeamCheck,
+                    Tooltip = "Enable it to make teammates color to green and enemies color to red."
+                })
+                Groupbox:AddToggle("Settings.VisibleCheck", {
+                    Text = "Visible Check",
+                    Default = Settings.VisibleCheck,
+                    Tooltip = "Enable it to"
+                })
+                
+                do
+                    AssignToggle("Settings.Enabled", {"Enabled"}, function()
+                        if (Toggles["Settings.Enabled"].Value) then
+                            ESPManager:BindToRenderStep()
+                        else
+                            task.wait(.21)
+                            ESPManager:UnbindFromRenderStep()
+                        end
+                    end)
+                    --AssignOptions("Settings.EnableKeybind", {"EnableKeybind"})
+                    AssignOptions("Settings.MaxDrawDistance", {"MaxDrawDistance"})
+                    AssignOptions("Settings.RefreshRate", {"RefreshRate"})
+                    AssignToggle("Settings.TeamColor", {"TeamColor"}, function()
+                        if (Toggles["Settings.TeamCheck"].Value) then
+                            Toggles["Settings.TeamCheck"]:SetValue(false)
+                        end
+                    end)
+                    AssignToggle("Settings.TeamCheck", {"TeamCheck"}, function()
+                        if (Toggles["Settings.TeamColor"].Value) then
+                            Toggles["Settings.TeamColor"]:SetValue(false)
+                        end
+                    end)
+                    AssignToggle("Settings.VisibleCheck", {"VisibleCheck"})
+                end
+            end
+
+            -- Boxes Groupbox
+            do
+                local Groupbox = Groupboxes.ESPTypes1.BoxesBox
+
+                Groupbox:AddDivider()
+
+                Groupbox:AddToggle("Settings.Boxes.Show", {
+                    Text = "Show Boxes",
+                    Default = Settings.Boxes.Show,
+                    Tooltip = "Enable it to show boxes type esp."
+                })
+                Groupbox:AddDropdown("Settings.Boxes.Mode", {
+                    Text = "Drawing Mode",
+                    Default = Settings.Boxes.Mode,
+                    Values = {"Dynamic", "Static"},
+                    Multi = false,
+                    Tooltip = "Dynamic for dynamic box type or Static for static box type."
+                })
+                Groupbox:AddLabel("Fill Color"):AddColorPicker("Settings.Boxes.FillColor", {
+                    Title = "Box Fill Color Picker",
+                    Default = Settings.Boxes.FillColor
+                })
+                Groupbox:AddSlider("Settings.Boxes.FillThickness", {
+                    Text = "Fill Thickness",
+                    Default = Settings.Boxes.FillThickness,
+                    Min = 1,
+                    Max = 5,
+                    Rounding = 1,
+                    Compact = false
+                })
+                Groupbox:AddSlider("Settings.Boxes.FillTransparency", {
+                    Text = "Fill Transparency",
+                    Default  = Settings.Boxes.FillTransparency,
+                    Min = 0,
+                    Max = 1,
+                    Rounding = 2,
+                    Compact = false
+                })
+                Groupbox:AddLabel("Outline Color"):AddColorPicker("Settings.Boxes.OutlineColor", {
+                    Title = "Box Outline Color Picker",
+                    Default = Settings.Boxes.OutlineColor
+                })
+                Groupbox:AddSlider("Settings.Boxes.OutlineThickness", {
+                    Text = "Outline Thickness",
+                    Default = Settings.Boxes.OutlineThickness,
+                    Min = 1,
+                    Max = 5,
+                    Rounding = 1,
+                    Compact = false
+                })
+                Groupbox:AddSlider("Settings.Boxes.OutlineTransparency", {
+                    Text = "Outline Transparency",
+                    Default  = Settings.Boxes.OutlineTransparency,
+                    Min = 0,
+                    Max = .2,
+                    Rounding = 2,
+                    Compact = false
+                })
+
+                do
+                    AssignToggle("Settings.Boxes.Show", {"Boxes", "Show"})
+                    AssignOptions("Settings.Boxes.Mode", {"Boxes", "Mode"})
+                    AssignOptions("Settings.Boxes.FillColor", {"Boxes", "FillColor"})
+                    AssignOptions("Settings.Boxes.FillThickness", {"Boxes", "FillThickness"})
+                    AssignOptions("Settings.Boxes.FillTransparency", {"Boxes", "FillTransparency"})
+                    AssignOptions("Settings.Boxes.OutlineColor", {"Boxes", "OutlineColor"})
+                    AssignOptions("Settings.Boxes.OutlineThickness", {"Boxes", "OutlineThickness"})
+                    AssignOptions("Settings.Boxes.OutlineTransparency", {"Boxes", "OutlineTransparency"})
+                end
+            end
+
+            return Groupboxes
+        end
     end
 end
-
-local repo = 'https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/'
-local library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
-
-local window = library:CreateWindow({
-    Title = "test",
-    Center = true,
-    AutoShow = true
-})
-local tab = window:AddTab("ESP")
-ESPManager:SetLibrary(library)
-ESPManager:CreateESPManager(tab)
-ESPManager:BindToRenderStep()
 
 return ESPManager
