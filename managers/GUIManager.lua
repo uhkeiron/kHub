@@ -13,7 +13,7 @@ local LinoriaThemeManager = loadstring(game:HttpGet(LinoriaRepository .. "addons
 local LinoriaSaveManager = loadstring(game:HttpGet(LinoriaRepository .. "addons/SaveManager.lua"))()
 
 local AscHubRepository = "https://raw.githubusercontent.com/Ausicius/AscHub-Roblox/master/"
-local AscHubESPManager = loadstring(game:HttpGet(AscHubRepository .. "managers/ESPManager.lua"))
+local AscHubESPManager = loadstring(game:HttpGet(AscHubRepository .. "managers/ESPManager.lua"))()
 
 
 --<< Main Code >>--
@@ -21,6 +21,7 @@ GUIManager = {} do
     -- Module Variables
     do
         GUIManager.LinoriaGUILibrary = LinoriaGUILibrary
+        GUIManager.AscHubESPManager = AscHubESPManager
         --GUIManager.UnloadFuncConnection = nil
     end
 
@@ -64,7 +65,7 @@ GUIManager = {} do
 
         function GUIManager:CreateWindow(name)
             local Window = LinoriaGUILibrary:CreateWindow({
-                Title = tostring(name),
+                Title = tostring("AscHub - " .. name),
                 Center = true,
                 AutoShow = true
             })
