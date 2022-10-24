@@ -54,7 +54,7 @@ local function NewDrawing(drawingType, properties)
         properties = properties or {}
 
         if (typeof(properties) == "table") then
-            for property, value in pairs(properties) do
+            for property, value in ipairs(properties) do
                 pcall(function()
                     DrawingInstance[property] = value
                 end)
