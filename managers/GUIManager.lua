@@ -37,7 +37,7 @@ GUIManager = {} do
             end)
             MenuGroup:AddLabel("Toggle GUI Keybind"):AddKeyPicker("Settings.ToggleGUIKeybind", {
                 Text = "Toggle GUI Key Picker",
-                Default = "RightShift",
+                Default = "RightControl",
                 NoUI = true
             })
             self.LinoriaGUILibrary.ToggleKeybind = Options["Settings.ToggleGUIKeybind"]

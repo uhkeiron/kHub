@@ -414,15 +414,25 @@ ESPManager = {} do
     
                 return Box
             end
-    
-            function ESPManager:RemoveAllStaticBox()
+            
+            function ESPManager:RemoveStaticBox(player)
                 for playerName, instancesTable in pairs(ESPManager.InstanceData) do
                     if not (ESPManager.InstanceData[playerName].DontDelete) then
-                        for key, value in pairs(instancesTable.Instances) do
-                            if (value.Type == "StaticBox") then
-                                value:SetVisibility(false)
-                                value:Remove()
-                                instancesTable.Instances[key] = nil
+                        if (player) and (player.Name == playerName) then
+                            for key, value in pairs(instancesTable.Instances) do
+                                if (value.Type == "StaticBox") then
+                                    value:SetVisibility(false)
+                                    value:Remove()
+                                    instancesTable.Instances[key] = nil
+                                end
+                            end
+                        elseif not (player) then
+                            for key, value in pairs(instancesTable.Instances) do
+                                if (value.Type == "StaticBox") then
+                                    value:SetVisibility(false)
+                                    value:Remove()
+                                    instancesTable.Instances[key] = nil
+                                end
                             end
                         end
                     end
@@ -793,7 +803,7 @@ ESPManager = {} do
                     AssignToggle("Settings.Boxes.Show", {"Boxes", "Show"})
                     AssignOptions("Settings.Boxes.Mode", {"Boxes", "Mode"}, function()
                         if (Options["Settings.Boxes.Mode"].Value == "Dynamic") then
-                            ESPManager:RemoveAllStaticBox()
+                            ESPManager:RemoveStaticBox()
                         elseif (Options["Settings.Boxes.Mode"].Value == "Static") then
 
                         end
@@ -801,7 +811,7 @@ ESPManager = {} do
                     if (ESPManager.IsQuadSupported) then
                         AssignToggle("Settings.Boxes.UseQuad", {"Boxes", "UseQuad"}, function()
                             if (Options["Settings.Boxes.Mode"].Value == "Static") then
-                                ESPManager:RemoveAllStaticBox()
+                                ESPManager:RemoveStaticBox()
                             end
                             ESPManager.IsQuadSupported = Toggles["Settings.Boxes.UseQuad"].Value
                         end)
