@@ -46,6 +46,8 @@ local function IsInArray(array, valueToFind)
         end
     end
 
+    array = {}
+
     return false
 end
 
@@ -61,12 +63,14 @@ local function NewDrawing(drawingType, properties)
             end
         end
 
+        properties = {}
+
         return DrawingInstance
     end
 end
 
 local function NewInstance(instanceType, properties)
-    local Instance = Instance.new("Highlight")
+    local Instance = Instance.new(instanceType)
 
     properties = properties or {}
 
@@ -79,6 +83,9 @@ local function NewInstance(instanceType, properties)
 
         Instance.Parent = properties.Parent
     end
+
+    properties = nil
+    instanceType = nil
 
     return Instance
 end
@@ -183,11 +190,6 @@ local function CheckPlayer(player)
     return pass, distance
 end
 
-local function GetNonNegative(number)
-    number *= 10
-    return (10 - number) / 10
-end
-
 
 --<< Main Code >>--
 --< Module
@@ -223,7 +225,7 @@ ESPManager = {} do
                 Show = true,
                 Mode = 1,
                 FillColor = Color3.fromRGB(207, 0, 0),
-                FillTransparency = 0.3,
+                FillTransparency = 0.5,
                 OutlineColor = Color3.fromHSV(0, 0, 0),
                 OutlineTransparency = 1
             }
@@ -293,7 +295,7 @@ ESPManager = {} do
                 end
                 
                 do
-                    function Box:Update(CF, size, player)
+                    function Box:Update(CF, size, player, parts)
                         if not (CF) and not (size) and not (player) then
                             return
                         end
@@ -386,6 +388,8 @@ ESPManager = {} do
                                     LineFill.Visible = false
                                     LineOutline.Visible = false
                                 end
+
+                                fromto = {}
                             end
     
                             Update(visibleTL, "TopLeft", {
@@ -405,6 +409,9 @@ ESPManager = {} do
                                 Vector2.new(bottomLeftPos.X, bottomLeftPos.Y)
                             })
                         end
+
+                        _properties = {}
+                        parts = {}
                     end
     
                     function Box:SetVisibility(boolean)
@@ -442,11 +449,12 @@ ESPManager = {} do
                             UpdateUnQuad("Outline")
                         end
 
-                        Box.Type = nil
-                        Box = nil
+                        Box = {}
                     end
                 end
-    
+                
+                properties = {}
+
                 return Box
             end
             
@@ -473,6 +481,199 @@ ESPManager = {} do
                     end
                 end
             end
+
+            function ESPManager:CreateDynamicBox()
+                local Box = {Type = "DynamicBox"}
+
+                local properties = {
+                    Fill = {
+                        Visible = true,
+                        ZIndex = 50,
+                        Transparency = Settings.Boxes.FillTransparency,
+                        Color = Settings.Boxes.FillColor,
+                        Thickness = Settings.Boxes.FillThickness
+                    },
+                    Outline = {
+                        Visible = true,
+                        Transparency = Settings.Boxes.OutlineTransparency,
+                        Color = Settings.Boxes.OutlineColor,
+                        Thickness = Settings.Boxes.OutlineThickness
+                    }
+                }
+
+                Box["Fill"] = NewDrawing("Square", properties.Fill)
+                Box["Outline"] = NewDrawing("Square", properties.Outline)
+
+                do
+                    function Box:Update(CF, size, player, parts)
+                        if not (CF) or not (size) or not (player) or not (parts) then
+                            return
+                        end
+
+                        local everyCorners = {}
+
+                        for _, v in pairs(parts) do
+                            local CF, size = v.CFrame, v.size
+
+                            local corners = {
+                                Vector3.new(CF.X + size.X / 2, CF.Y + size.Y / 2, CF.Z + size.Z / 2),
+                                Vector3.new(CF.X - size.X / 2, CF.Y + size.Y / 2, CF.Z + size.Z / 2),
+                                Vector3.new(CF.X - size.X / 2, CF.Y - size.Y / 2, CF.Z - size.Z / 2),
+                                Vector3.new(CF.X + size.X / 2, CF.Y - size.Y / 2, CF.Z - size.Z / 2),
+                                Vector3.new(CF.X - size.X / 2, CF.Y + size.Y / 2, CF.Z - size.Z / 2),
+                                Vector3.new(CF.X + size.X / 2, CF.Y + size.Y / 2, CF.Z - size.Z / 2),
+                                Vector3.new(CF.X - size.X / 2, CF.Y - size.Y / 2, CF.Z + size.Z / 2),
+                                Vector3.new(CF.X + size.X / 2, CF.Y - size.Y / 2, CF.Z + size.Z / 2)
+                            }
+
+                            for _, v in ipairs(corners) do
+                                table.insert(everyCorners, v)
+                            end
+
+                            corners = {}
+                        end
+
+                        local Min = {
+                            X = CurrentCamera.ViewportSize.X,
+                            Y = CurrentCamera.ViewportSize.Y
+                        }
+                        local Max = {
+                            X = 0,
+                            Y = 0
+                        }
+
+                        local visible = true
+
+                        local function UpdateMinMax(dimension, position)
+                            local oMin = Min[dimension]
+                            local oMax = Min[dimension]
+                            local positionO = position[dimension]
+
+                            if (positionO < oMin) then
+                                oMin = positionO
+                            end
+                            if (positionO > oMax) then
+                                oMax = positionO
+                            end
+                        end
+
+                        for _, v in ipairs(everyCorners) do
+                            local position, _visible = CurrentCamera:WorldToViewportPoint(v)
+
+                            if (visible) and not (_visible) then
+                                visible = false
+                                break
+                            end
+
+                            UpdateMinMax("X", position)
+                            UpdateMinMax("Y", position)
+                        end
+
+                        local xSize, ySize = Max.X - Min.X, Max.Y - Min.Y
+
+                        local Fill = Box["Fill"]
+                        local Outline = Box["Outline"]
+
+                        local _properties = {
+                            ["Fill"] = {
+                                ZIndex = 50,
+                                Transparency = Settings.Boxes.FillTransparency,
+                                Color = Color3.fromRGB(255, 255, 255),
+                                Thickness = Settings.Boxes.FillThickness
+                            },
+                            ["Outline"] = {
+                                Transparency = Settings.Boxes.OutlineTransparency,
+                                Color = Settings.Boxes.OutlineColor,
+                                Thickness = Settings.Boxes.OutlineThickness
+                            }
+                        }
+
+                        do
+                            if (Settings.TeamCheck) then
+                                if (CheckTeam(player)) then
+                                    _properties.Fill.Color = Color3.fromRGB(0, 255, 0)
+                                else
+                                    _properties.Fill.Color = Color3.fromRGB(255, 0, 0)
+                                end
+                            elseif (Settings.TeamColor) then
+                                if (player.TeamColor.Color) then
+                                    _properties.Fill.Color = player.TeamColor.Color
+                                end
+                            elseif not (Settings.TeamCheck) and not (Settings.TeamColor) then
+                                _properties.Fill.Color = Settings.Boxes.FillColor
+                            end
+                        end
+
+                        local function Update(squareType)
+                            local SquareBox = Box[squareType]
+    
+                            SquareBox.Visible = true
+                            SquareBox.Position = Vector2.new(Min.X, Min.Y)
+                            SquareBox.Size = Vector2.new(xSize, ySize)
+    
+                            for property, value in pairs(_properties[squareType]) do
+                                SquareBox[property] = value
+                            end
+                        end
+
+                        Update("Fill")
+                        Update("Outline")
+
+                        parts = {}
+                        everyCorners = {}
+                        _properties = {}
+                        Min = {}
+                        Max = {}
+                    end
+
+                    function Box:SetVisibility(boolean)
+                        if (Box["Fill"]) and (Box["Outline"]) then
+                            Box["Fill"].Visible = boolean
+                            Box["Outline"].Visible = boolean
+                        end
+                    end
+
+                    function Box:Remove()
+                        Box:SetVisibility(false)
+
+                        if (Box["Fill"]) and (Box["Outline"]) then
+                            Box["Fill"]:Remove()
+                            Box["Outline"]:Remove()
+                        end
+
+                        Box = {}
+                    end
+                end
+
+                properties = {}
+
+                return Box
+            end
+
+            function ESPManager:RemoveDynamicBox(player)
+                for playerName, instancesTable in pairs(ESPManager.InstanceData) do
+                    if not (ESPManager.InstanceData[playerName].DontDelete) then
+                        if (player) and (player.Name == playerName) then
+                            for key, value in pairs(instancesTable.Instances) do
+                                if (value.Type == "DynamicBox") then
+                                    value:SetVisibility(false)
+                                    value:Remove()
+                                    instancesTable.Instances[key] = nil
+                                end
+                            end
+                        elseif not (player) then
+                            for key, value in pairs(instancesTable.Instances) do
+                                if (value.Type == "DynamicBox") then
+                                    value:SetVisibility(false)
+                                    value:Remove()
+                                    instancesTable.Instances[key] = nil
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+
 
             function ESPManager:CreateCham()
                 local Cham = {Type = "Cham"}
@@ -528,6 +729,8 @@ ESPManager = {} do
                         for property, value in pairs(_properties) do
                             _Cham[property] = value
                         end
+
+                        _properties = {}
                     end
 
                     function Cham:SetVisibility(boolean)
@@ -543,8 +746,7 @@ ESPManager = {} do
                             Cham["Cham"]:Destroy()
                         end
 
-                        Cham.Type = nil
-                        Cham = nil
+                        Cham = {}
                     end
                 end
 
@@ -621,7 +823,7 @@ ESPManager = {} do
                     local data = ESPManager.InstanceData[player.Name] or {Instances = {}}
 
                     if (Settings.Boxes.Mode == "Dynamic") then
-                        data.Instances["Box"] = data.Instances["Box"] or ESPManager:CreateStaticBox()
+                        data.Instances["Box"] = data.Instances["Box"] or ESPManager:CreateDynamicBox()
                     else
                         data.Instances["Box"] = data.Instances["Box"] or ESPManager:CreateStaticBox()
                     end
@@ -671,7 +873,7 @@ ESPManager = {} do
                                         Character:FindFirstChild("Right Arm") or Character:FindFirstChild("RightLowerArm")
                                     }
     
-                                    Box:Update(HumanoidRootPart.CFrame, Vector3.new(2, 3, 1) * (scale * 2), player)
+                                    Box:Update(HumanoidRootPart.CFrame, Vector3.new(2, 3, 1) * (scale * 2), player, Body)
                                 else
                                     Box:SetVisibility(false)
                                 end
@@ -884,6 +1086,7 @@ ESPManager = {} do
                         if not (Toggles["Settings.ShowMyself"].Value) then
                             ESPManager:RemoveStaticBox(LocalPlayer)
                             ESPManager:RemoveCham(LocalPlayer)
+                            ESPManager:RemoveDynamicBox(LocalPlayer)
                         end
                     end)
                 end
@@ -961,7 +1164,7 @@ ESPManager = {} do
                         if (Options["Settings.Boxes.Mode"].Value == "Dynamic") then
                             ESPManager:RemoveStaticBox()
                         elseif (Options["Settings.Boxes.Mode"].Value == "Static") then
-
+                            ESPManager:RemoveDynamicBox()
                         end
                     end)
                     if (ESPManager.IsQuadSupported) then
@@ -1025,6 +1228,11 @@ ESPManager = {} do
                 })
 
                 do
+                    local function GetNonNegative(number)
+                        number *= 10
+                        return (10 - number) / 10
+                    end
+
                     AssignToggle("Settings.Chams.Show", {"Chams", "Show"})
                     AssignOptions("Settings.Chams.Mode", {"Chams", "Mode"})
                     AssignOptions("Settings.Chams.FillColor", {"Chams", "FillColor"})

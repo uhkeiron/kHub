@@ -30,4 +30,5 @@ Tabs["Settings"].Tab = GUIManager:BuildSettings(Window, "Universal")
 GUIManager:SetUnloadFunction(function()
     GUIManager.AscHubESPManager:UnbindFromRenderStep()
     GUIManager.AscHubESPManager:RemoveESP()
+    Tabs = {}
 end)
