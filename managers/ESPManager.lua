@@ -208,7 +208,7 @@ ESPManager = {} do
         end
 
         function ESPManager:CreateStaticBox()
-            local Box = {}
+            local Box = {Type = "StaticBox"}
 
             local properties = {
                 Fill = {
@@ -400,10 +400,23 @@ ESPManager = {} do
             return Box
         end
 
+        function ESPManager:RemoveAllStaticBox()
+            for playerName, instancesTable in pairs(ESPManager.InstanceData) do
+                if not (ESPManager.InstanceData[playerName].DontDelete) then
+                    for key, value in pairs(instancesTable) do
+                        if (value.Type == "StaticBox") then
+                            value.Visible = false
+                            value:Remove()
+                            instancesTable.Instances[key] = nil
+                        end
+                    end
+                end
+            end
+        end
+
         function ESPManager:UpdatePlayerData()
             if (tick() - lastRefresh) > (ESPManager.Settings.RefreshRate / 1000) then
                 lastRefresh = tick()
-
                 --[[
                 for i, v in pairs(self.RenderList.Instances) do
                     if (v.Instance ~= nil) and (v.Instance.Parent ~= nil) and (v.Instance:IsA("BasePart")) then
@@ -710,7 +723,11 @@ ESPManager = {} do
 
                 do
                     AssignToggle("Settings.Boxes.Show", {"Boxes", "Show"})
-                    AssignOptions("Settings.Boxes.Mode", {"Boxes", "Mode"})
+                    AssignOptions("Settings.Boxes.Mode", {"Boxes", "Mode"}, function()
+                        if (Options["Settings.Boxes.Mode"].Value == 1) then
+                            ESPManager:RemoveAllStaticBox()
+                        end
+                    end)
                     AssignOptions("Settings.Boxes.FillColor", {"Boxes", "FillColor"})
                     AssignOptions("Settings.Boxes.FillThickness", {"Boxes", "FillThickness"})
                     AssignOptions("Settings.Boxes.FillTransparency", {"Boxes", "FillTransparency"})

@@ -46,7 +46,7 @@ GUIManager = {} do
             LinoriaSaveManager:SetLibrary(self.LinoriaGUILibrary)
 
             LinoriaSaveManager:IgnoreThemeSettings()
-            LinoriaSaveManager:SetIgnoreIndexes("Settings.ToggleGUIKeybind")
+            LinoriaSaveManager:SetIgnoreIndexes({"Settings.ToggleGUIKeybind"})
 
             LinoriaThemeManager:SetFolder("AscHub")
             LinoriaSaveManager:SetFolder("AscHub/" .. tostring(gamefolder))
