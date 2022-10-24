@@ -375,12 +375,10 @@ ESPManager = {} do
     
                     function Box:SetVisibility(boolean)
                         local function UpdateUnQuad(lineType)
-                            for key, _ in pairs(Box[lineType]) do
-                                key["TopLeft"].Visible = boolean
-                                key["TopRight"].Visible = boolean
-                                key["BottomLeft"].Visible = boolean
-                                key["BottomRight"].Visible = boolean
-                            end
+                            Box[lineType]["TopLeft"].Visible = boolean
+                            Box[lineType]["TopRight"].Visible = boolean
+                            Box[lineType]["BottomLeft"].Visible = boolean
+                            Box[lineType]["BottomRight"].Visible = boolean
                         end
     
                         if (ESPManager.IsQuadSupported) then
