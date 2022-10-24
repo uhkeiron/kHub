@@ -322,10 +322,10 @@ ESPManager = {} do
                                 Box["Outline"].Visible = false
                             end
                         else
-                            visibleTL = topLeftPos > 0
-                            visibleTR = topRightPos > 0
-                            visibleBL = bottomLeftPos > 0
-                            visibleBR = bottomRightPos > 0
+                            visibleTL = topLeftPos.Z > 0
+                            visibleTR = topRightPos.Z > 0
+                            visibleBL = bottomLeftPos.Z > 0
+                            visibleBR = bottomRightPos.Z > 0
                             
                             local function Update(visiblePos, corner, fromto)
                                 local LineFill = Box["Fill"][corner]
@@ -394,12 +394,10 @@ ESPManager = {} do
                         Box:SetVisibility(false)
     
                         local function UpdateUnQuad(lineType)
-                            for key, _ in pairs(Box[lineType]) do
-                                key["TopLeft"]:Remove()
-                                key["TopRight"]:Remove()
-                                key["BottomLeft"]:Remove()
-                                key["BottomRight"]:Remove()
-                            end
+                            Box[lineType]["TopLeft"]:Remove()
+                            Box[lineType]["TopRight"]:Remove()
+                            Box[lineType]["BottomLeft"]:Remove()
+                            Box[lineType]["BottomRight"]:Remove()
                         end
     
                         if (ESPManager.IsQuadSupported) then
