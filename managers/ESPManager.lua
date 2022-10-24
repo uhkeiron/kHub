@@ -214,14 +214,13 @@ ESPManager = {} do
                 local properties = {
                     Fill = {
                         Visible = true,
-                        ZIndex = 1,
+                        ZIndex = 50,
                         Transparency = Settings.Boxes.FillTransparency,
                         Color = Settings.Boxes.FillColor,
                         Thickness = Settings.Boxes.FillThickness
                     },
                     Outline = {
                         Visible = true,
-                        ZIndex = 2,
                         Transparency = Settings.Boxes.OutlineTransparency,
                         Color = Settings.Boxes.OutlineColor,
                         Thickness = Settings.Boxes.OutlineThickness
@@ -272,6 +271,7 @@ ESPManager = {} do
     
                         local _properties = {
                             ["Fill"] = {
+                                ZIndex = 50,
                                 Transparency = Settings.Boxes.FillTransparency,
                                 Color = Color3.fromRGB(255, 255, 255),
                                 Thickness = Settings.Boxes.FillThickness
