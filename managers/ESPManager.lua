@@ -769,7 +769,7 @@ ESPManager = {} do
                 elseif (#settingDirectories == 2) then
                     _type[index]:OnChanged(function()
                         if not (customSettingsApplier) then
-                            Settings[settingDirectories[1][settingDirectories[2]]] = _type[index].Value
+                            Settings[settingDirectories[1]][settingDirectories[2]] = _type[index].Value
                             func()
                         else
                             func()
