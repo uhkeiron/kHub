@@ -729,7 +729,11 @@ ESPManager = {} do
                         end
                     end)
                     AssignToggle("Settings.VisibleCheck", {"VisibleCheck"})
-                    AssignToggle("Settings.ShowMyself", {"ShowMyself"})
+                    AssignToggle("Settings.ShowMyself", {"ShowMyself"}, function()
+                        if not (Toggles["Settings.ShowMyself"].Value) then
+                            ESPManager:RemoveStaticBox(LocalPlayer)
+                        end
+                    end)
                 end
             end
 
