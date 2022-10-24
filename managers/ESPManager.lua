@@ -188,8 +188,8 @@ ESPManager = {} do
                 Show = true,
                 Mode = 2,
                 UseQuad = true,
-                FillColor = Color3.fromHSV(0, 0, 1),
-                FillThickness = 1,
+                FillColor = Color3.fromRGB(207, 0, 0),
+                FillThickness = 3,
                 FillTransparency = 1,
                 OutlineColor = Color3.fromHSV(0, 0, 0),
                 OutlineThickness = 6,
@@ -816,8 +816,8 @@ ESPManager = {} do
                         AssignToggle("Settings.Boxes.UseQuad", {"Boxes", "UseQuad"}, function()
                             if (Options["Settings.Boxes.Mode"].Value == "Static") then
                                 ESPManager:RemoveStaticBox()
+                                ESPManager.IsQuadSupported = Toggles["Settings.Boxes.UseQuad"].Value
                             end
-                            ESPManager.IsQuadSupported = Toggles["Settings.Boxes.UseQuad"].Value
                         end)
                     end
                     AssignOptions("Settings.Boxes.FillColor", {"Boxes", "FillColor"})

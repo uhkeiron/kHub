@@ -9,11 +9,11 @@ local GUIManager
 --< Others
 local LinoriaRepository = "https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/"
 local LinoriaGUILibrary = loadstring(game:HttpGet(LinoriaRepository .. "Library.lua"))()
-local LinoriaThemeManager = loadstring(game:HttpGet(LinoriaRepository .. "addons/ThemeManager.lua"))()
 local LinoriaSaveManager = loadstring(game:HttpGet(LinoriaRepository .. "addons/SaveManager.lua"))()
 
 local AscHubRepository = "https://raw.githubusercontent.com/Ausicius/AscHub-Roblox/master/"
 local AscHubESPManager = loadstring(game:HttpGet(AscHubRepository .. "managers/ESPManager.lua"))()
+local AscHubThemeManager = loadstring(game:HttpGet(AscHubRepository .. "managers/ThemeManager.lua"))()
 
 
 --<< Main Code >>--
@@ -42,16 +42,16 @@ GUIManager = {} do
             })
             self.LinoriaGUILibrary.ToggleKeybind = Options["Settings.ToggleGUIKeybind"]
             
-            LinoriaThemeManager:SetLibrary(self.LinoriaGUILibrary)
+            AscHubThemeManager:SetLibrary(self.LinoriaGUILibrary)
             LinoriaSaveManager:SetLibrary(self.LinoriaGUILibrary)
 
             LinoriaSaveManager:IgnoreThemeSettings()
             LinoriaSaveManager:SetIgnoreIndexes({"Settings.ToggleGUIKeybind"})
 
-            LinoriaThemeManager:SetFolder("AscHub")
+            AscHubThemeManager:SetFolder("AscHub")
             LinoriaSaveManager:SetFolder("AscHub/" .. tostring(gamefolder))
 
-            LinoriaThemeManager:ApplyToTab(tab)
+            AscHubThemeManager:ApplyToTab(tab)
             LinoriaSaveManager:BuildConfigSection(tab)
 
             return tab, MenuGroup
@@ -67,7 +67,8 @@ GUIManager = {} do
             local Window = LinoriaGUILibrary:CreateWindow({
                 Title = tostring("AscHub - " .. name),
                 Center = true,
-                AutoShow = true
+                AutoShow = true,
+                Size = UDim2.new(0, 550, 0, 610)
             })
 
             return Window
