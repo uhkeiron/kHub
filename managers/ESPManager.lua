@@ -3,6 +3,7 @@ local HttpService = game:GetService("HttpService")
 local PlayersService = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local WorkspaceService = game:GetService("Workspace")
+local CoreGuiService = game:GetService("CoreGui")
 
 
 --<< Constants >>--
@@ -26,6 +27,7 @@ local UpdateNmae = shared.RunServiceName .. "-Update"
 
 --<< Variables >>--
 shared.InstanceData = shared.InstanceData or {}
+shared.ChamsFolder = shared.ChamsFolder or Instance.new("Folder", CoreGuiService)
 local lastRefresh = 0
 local lastInvalidCheck = 0
 local lastRayIgnoreUpdate = 0
@@ -38,7 +40,7 @@ local function IsInArray(array, valueToFind)
     array = array or {}
     valueToFind = valueToFind or "dummy"
 
-    for index, value in pairs(array) do
+    for index, value in ipairs(array) do
         if (valueToFind == value) then
             return true
         end
@@ -54,14 +56,24 @@ local function NewDrawing(drawingType, properties)
         properties = properties or {}
 
         if (typeof(properties) == "table") then
-            for property, value in ipairs(properties) do
-                pcall(function()
-                    DrawingInstance[property] = value
-                end)
+            for property, value in pairs(properties) do
+                DrawingInstance[property] = value
             end
         end
 
         return DrawingInstance
+    end
+end
+
+local function NewInstance(instanceType, properties)
+    local Instance = Instance.new("Highlight")
+
+    properties = properties or {}
+
+    if (typeof(properties) == "table") then
+        for property, value in pairs(properties) do
+            Instance[property] = value
+        end
     end
 end
 
@@ -165,6 +177,11 @@ local function CheckPlayer(player)
     return pass, distance
 end
 
+local function GetNonNegative(number)
+    number *= 10
+    return (10 - number) / 10
+end
+
 
 --<< Main Code >>--
 --< Module
@@ -174,6 +191,7 @@ ESPManager = {} do
         ESPManager.Library = nil
         ESPManager.RenderList = {Instances = {}}
         ESPManager.InstanceData = shared.InstanceData
+        ESPManager.ChamsFolder = shared.ChamsFolder
 
         ESPManager.Settings = {
             Enabled = true,
@@ -194,6 +212,14 @@ ESPManager = {} do
                 OutlineColor = Color3.fromHSV(0, 0, 0),
                 OutlineThickness = 6,
                 OutlineTransparency = 1,
+            },
+            Chams = {
+                Show = true,
+                Mode = 1,
+                FillColor = Color3.fromRGB(207, 0, 0),
+                FillTransparency = 1,
+                OutlineColor = Color3.fromHSV(0, 0, 0),
+                OutlineTransparency = 1
             }
         }
         ESPManager.IsQuadSupported = pcall(function()
@@ -290,7 +316,7 @@ ESPManager = {} do
                                 if (CheckTeam(player)) then
                                     _properties.Fill.Color = Color3.fromRGB(0, 255, 0)
                                 else
-                                    _properties.Fill.Color = Color3.fromRGB(0, 255, 0)
+                                    _properties.Fill.Color = Color3.fromRGB(255, 0, 0)
                                 end
                             elseif (Settings.TeamColor) then
                                 if (player.TeamColor.Color) then
@@ -409,6 +435,9 @@ ESPManager = {} do
                             UpdateUnQuad("Fill")
                             UpdateUnQuad("Outline")
                         end
+
+                        Box.Type = nil
+                        Box = nil
                     end
                 end
     
@@ -429,6 +458,107 @@ ESPManager = {} do
                         elseif not (player) then
                             for key, value in pairs(instancesTable.Instances) do
                                 if (value.Type == "StaticBox") then
+                                    value:SetVisibility(false)
+                                    value:Remove()
+                                    instancesTable.Instances[key] = nil
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+
+            function ESPManager:CreateCham()
+                local Cham = {Type = "Cham"}
+
+                local properties = {
+                    DepthMode = Settings.Chams.Mode,
+                    Enabled = true,
+                    FillColor = Settings.Chams.FillColor,
+                    FillTransparency = Settings.Chams.FillTransparency,
+                    OutlineColor = Settings.Chams.OutlineColor,
+                    OutlineTransparency = Settings.Chams.OutlineTransparency,
+                    Parent = ESPManager.ChamsFolder
+                }
+
+                Cham["Cham"] = NewInstance("Highlight", properties)
+
+                do
+                    function Cham:Update(player, Character)
+                        if not (player) then
+                            return
+                        end
+                        --local Character = GetCharacter(player)
+                        local _properties = {
+                            DepthMode = Settings.Chams.Mode,
+                            FillColor = Settings.Chams.FillColor,
+                            FillTransparency = Settings.Chams.FillTransparency,
+                            OutlineColor = Settings.Chams.OutlineColor,
+                            OutlineTransparency = Settings.Chams.OutlineTransparency,
+                        }
+
+                        do
+                            if (Settings.TeamCheck) then
+                                if (CheckTeam(player)) then
+                                    _properties.FillColor = Color3.fromRGB(0, 255, 0)
+                                else
+                                    _properties.FillColor = Color3.fromRGB(255, 0, 0)
+                                end
+                            elseif (Settings.TeamColor) then
+                                if (player.TeamColor.Color) then
+                                    _properties.FillColor = player.TeamColor.Color
+                                end
+                            elseif not (Settings.TeamCheck) and not (Settings.TeamColor) then
+                                _properties.FillColor = Settings.Chams.FillColor
+                            end
+                        end
+
+                        local _Cham = Cham["Cham"]
+                        _Cham.Enabled = true
+                        if (_Cham.Adornee ~= Character) then
+                            _Cham.Adornee = Character
+                        end
+
+                        for property, value in pairs(_properties) do
+                            _Cham[property] = value
+                        end
+                    end
+
+                    function Cham:SetVisibility(boolean)
+                        if (Cham["Cham"]) then
+                            Cham["Cham"].Enabled = false
+                        end
+                    end
+
+                    function Cham:Remove()
+                        Cham:SetVisibility(false)
+
+                        if (Cham["Cham"]) then
+                            Cham["Cham"]:Destroy()
+                        end
+
+                        Cham.Type = nil
+                        Cham = nil
+                    end
+                end
+
+                return Cham
+            end
+
+            function ESPManager:RemoveCham(player)
+                for playerName, instancesTable in pairs(ESPManager.InstanceData) do
+                    if not (ESPManager.InstanceData[playerName].DontDelete) then
+                        if (player) and (player.Name == playerName) then
+                            for key, value in pairs(instancesTable.Instances) do
+                                if (value.Type == "Cham") then
+                                    value:SetVisibility(false)
+                                    value:Remove()
+                                    instancesTable.Instances[key] = nil
+                                end
+                            end
+                        elseif not (player) then
+                            for key, value in pairs(instancesTable.Instances) do
+                                if (value.Type == "Cham") then
                                     value:SetVisibility(false)
                                     value:Remove()
                                     instancesTable.Instances[key] = nil
@@ -484,13 +614,16 @@ ESPManager = {} do
 
                     local data = ESPManager.InstanceData[player.Name] or {Instances = {}}
 
-                    if (ESPManager.Settings.Boxes.Mode == "Dynamic") then
+                    if (Settings.Boxes.Mode == "Dynamic") then
                         data.Instances["Box"] = data.Instances["Box"] or ESPManager:CreateStaticBox()
                     else
                         data.Instances["Box"] = data.Instances["Box"] or ESPManager:CreateStaticBox()
                     end
 
+                    data.Instances["Cham"] = data.Instances["Cham"] or ESPManager:CreateCham()
+
                     local Box = data.Instances["Box"]
+                    local Cham = data.Instances["Cham"]
 
                     local Character = GetCharacter(player)
                     local pass, distance = CheckPlayer(player)
@@ -513,11 +646,15 @@ ESPManager = {} do
 
                             local position = CurrentCamera:WorldToViewportPoint(CurrentCamera.CFrame:PointToWorldSpace(objectPosition))
 
+                            if (Settings.Chams.Show) then
+                                Cham:Update(player, Character)
+                            end
+
                             if (screenPosition.Z > 0) then
                                 local screenPositionUpper = CurrentCamera:WorldToViewportPoint((HumanoidRootPart:GetRenderCFrame() * CFrame.new(0, Head.Size.Y + HumanoidRootPart.Size.Y + 0, 0)).Position)
                                 local scale = Head.Size.Y / 2
 
-                                if (ESPManager.Settings.Boxes.Show) and (visible) and (HumanoidRootPart) then
+                                if (Settings.Boxes.Show) and (visible) and (HumanoidRootPart) then
                                     local Body = {
                                         Head,
                                         Character:FindFirstChild("Left Leg")or Character:FindFirstChild("LeftLowerLeg"),
@@ -534,9 +671,11 @@ ESPManager = {} do
                                 Box:SetVisibility(false)
                             end
                         else
+                            Cham:SetVisibility(false)
                             Box:SetVisibility(false)
                         end
                     else
+                        Cham:SetVisibility(false)
                         Box:SetVisibility(false)
                     end
 
@@ -611,36 +750,40 @@ ESPManager = {} do
             Groupboxes.ESPTypes2.ArrowsBox = Groupboxes.ESPTypes2.Tabbox:AddTab("Arrows")
             Groupboxes.ESPTypes2.DotsBox = Groupboxes.ESPTypes2.Tabbox:AddTab("Dots")
 
-            local function AssignToggle(index, settingDirectories, func)
-                func = func or function() end
-
+            local function Assign(index, settingDirectories, func, customSettingsApplier, _type)
                 if (#settingDirectories == 1) then
-                    Toggles[index]:OnChanged(function()
-                        Settings[settingDirectories[1]] = Toggles[index].Value
-                        func()
+                    _type[index]:OnChanged(function()
+                        if not (customSettingsApplier) then
+                            Settings[settingDirectories[1]] = _type[index].Value
+                            func()
+                        else
+                            func()
+                        end
                     end)
                 elseif (#settingDirectories == 2) then
-                    Toggles[index]:OnChanged(function()
-                        Settings[settingDirectories[1]][settingDirectories[2]] = Toggles[index].Value
-                        func()
+                    _type[index]:OnChanged(function()
+                        if not (customSettingsApplier) then
+                            Settings[settingDirectories[1][settingDirectories[2]]] = _type[index].Value
+                            func()
+                        else
+                            func()
+                        end
                     end)
                 end
             end
 
-            local function AssignOptions(index, settingDirectories, func)
+            local function AssignToggle(index, settingDirectories, func, customSettingsApplier)
                 func = func or function() end
+                customSettingsApplier = customSettingsApplier or false
 
-                if (#settingDirectories == 1) then
-                    Options[index]:OnChanged(function()
-                        Settings[settingDirectories[1]] = Options[index].Value
-                        func()
-                    end)
-                elseif (#settingDirectories == 2) then
-                    Options[index]:OnChanged(function()
-                        Settings[settingDirectories[1]][settingDirectories[2]] = Options[index].Value
-                        func()
-                    end)
-                end
+                Assign(index, settingDirectories, func, customSettingsApplier, Toggles)
+            end
+
+            local function AssignOptions(index, settingDirectories, func, customSettingsApplier)
+                func = func or function() end
+                customSettingsApplier = customSettingsApplier or false
+
+                Assign(index, settingDirectories, func, customSettingsApplier, Options)
             end
 
             -- Main Groupbox
@@ -732,6 +875,7 @@ ESPManager = {} do
                     AssignToggle("Settings.ShowMyself", {"ShowMyself"}, function()
                         if not (Toggles["Settings.ShowMyself"].Value) then
                             ESPManager:RemoveStaticBox(LocalPlayer)
+                            ESPManager:RemoveCham(LocalPlayer)
                         end
                     end)
                 end
@@ -826,6 +970,63 @@ ESPManager = {} do
                     AssignOptions("Settings.Boxes.OutlineColor", {"Boxes", "OutlineColor"})
                     AssignOptions("Settings.Boxes.OutlineThickness", {"Boxes", "OutlineThickness"})
                     AssignOptions("Settings.Boxes.OutlineTransparency", {"Boxes", "OutlineTransparency"})
+                end
+            end
+
+            -- Chams Groupbox
+            do
+                local Groupbox = Groupboxes.ESPTypes1.ChamsBox
+
+                Groupbox:AddDivider()
+
+                Groupbox:AddToggle("Settings.Chams.Show", {
+                    Text = "Show Chams",
+                    Default = Settings.Chams.Show,
+                    Tooltip = "Enable it to show chams type esp."
+                })
+                Groupbox:AddDropdown("Settings.Chams.Mode", {
+                    Text = "Depth Mode",
+                    Default = Settings.Chams.Mode,
+                    Values = {"AlwaysOnTop", "Occluded"},
+                    Multi = false,
+                    Tooltip = "AlwaysOnTop for the chams to always stay on top of the others and Occluded for the chams to only show up if it's visible."
+                })
+                Groupbox:AddLabel("Fill Color"):AddColorPicker("Settings.Chams.FillColor", {
+                    Title = "Chams Fill Color Picker",
+                    Default = Settings.Chams.FillColor
+                })
+                Groupbox:AddSlider("Settings.Chams.FillTransparency", {
+                    Text = "Fill Transparency",
+                    Default = Settings.Chams.FillTransparency,
+                    Min = 0,
+                    Max = 1,
+                    Rounding = 2,
+                    Compact = false
+                })
+                Groupbox:AddLabel("Outline Color"):AddColorPicker("Settings.Chams.OutlineColor", {
+                    Title = "Chams Outline Color Picker",
+                    Default = Settings.Chams.OutlineColor
+                })
+                Groupbox:AddSlider("Settings.Chams.OutlineTransparency", {
+                    Text = "Outline Transparency",
+                    Default = Settings.Chams.OutlineTransparency,
+                    Min = 0,
+                    Max = 1,
+                    Rounding = 2,
+                    Compact = false
+                })
+
+                do
+                    AssignToggle("Settings.Chams.Show", {"Chams", "Show"})
+                    AssignOptions("Settings.Chams.Mode", {"Chams", "Mode"})
+                    AssignOptions("Settings.Chams.FillColor", {"Chams", "FillColor"})
+                    AssignOptions("Settings.Chams.FillTransparency", {"Chams", "FillTransparency"}, function()
+                        Settings["Chams"]["FillTransparency"] = GetNonNegative(Options["Settings.Chams.FillTransparency"].Value)
+                    end, true)
+                    AssignOptions("Settings.Chams.OutlineColor", {"Chams", "OutlineColor"})
+                    AssignOptions("Settings.Chams.OutlineTransparency", {"Chams", "OutlineTransparency"}, function()
+                        Settings["Chams"]["OutlineTransparency"] = GetNonNegative(Options["Settings.Chams.OutlineTransparency"].Value)
+                    end, true)
                 end
             end
 
