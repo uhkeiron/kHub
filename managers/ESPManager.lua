@@ -404,10 +404,16 @@ ESPManager = {} do
             print("ESPManager:RemoveAllStaticBox() called")
 
             for playerName, instancesTable in pairs(ESPManager.InstanceData) do
+                warn("---------------------------------------")
+                print("Player Name = ", tostring(playerName))
+                print("Instances Table = ", tostring(instancesTable))
+
                 if not (ESPManager.InstanceData[playerName].DontDelete) then
+                    print("Don't Delete = false")
+
                     for key, value in pairs(instancesTable) do
-                        print(tostring(key))
-                        print(tostring(value))
+                        print("Key = ", tostring(key))
+                        print("Value = ", tostring(value))
 
                         if (value.Type == "StaticBox") then
                             print("Found a StaticBox")
@@ -665,12 +671,14 @@ ESPManager = {} do
                     AssignToggle("Settings.TeamColor", {"TeamColor"}, function()
                         if (Toggles["Settings.TeamCheck"].Value) then
                             Toggles["Settings.TeamCheck"]:SetValue(false)
+                            task.wait()
                             Toggles["Settings.TeamColor"]:SetValue(true)
                         end
                     end)
                     AssignToggle("Settings.TeamCheck", {"TeamCheck"}, function()
                         if (Toggles["Settings.TeamColor"].Value) then
                             Toggles["Settings.TeamColor"]:SetValue(false)
+                            task.wait()
                             Toggles["Settings.TeamCheck"]:SetValue(true)
                         end
                     end)
