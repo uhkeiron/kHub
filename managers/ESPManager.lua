@@ -338,7 +338,7 @@ ESPManager = {} do
     
                                     LineOutline.Visible = true
                                     LineOutline.From = fromto[1]
-                                    LineFill.To = fromto[2]
+                                    LineOutline.To = fromto[2]
     
                                     for property, value in pairs(_properties["Fill"]) do
                                         LineFill[property] = value
