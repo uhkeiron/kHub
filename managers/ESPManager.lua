@@ -194,9 +194,9 @@ ESPManager = {} do
                 OutlineTransparency = 1,
             }
         }
-        ESPManager.IsQuadSupported = false --[[pcall(function()
+        ESPManager.IsQuadSupported = pcall(function()
             Drawing.new("Quad"):Remove()
-        end)]]--
+        end)
     end
 
     -- Module Functions
@@ -214,14 +214,14 @@ ESPManager = {} do
                 local properties = {
                     Fill = {
                         Visible = true,
-                        ZIndex = 2,
+                        ZIndex = 1,
                         Transparency = Settings.Boxes.FillTransparency,
                         Color = Settings.Boxes.FillColor,
                         Thickness = Settings.Boxes.FillThickness
                     },
                     Outline = {
                         Visible = true,
-                        ZIndex = 1,
+                        ZIndex = 2,
                         Transparency = Settings.Boxes.OutlineTransparency,
                         Color = Settings.Boxes.OutlineColor,
                         Thickness = Settings.Boxes.OutlineThickness
