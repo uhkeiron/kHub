@@ -411,7 +411,7 @@ ESPManager = {} do
                 if not (ESPManager.InstanceData[playerName].DontDelete) then
                     print("Don't Delete = false")
 
-                    for key, value in pairs(instancesTable) do
+                    for key, value in pairs(instancesTable.Instances) do
                         print("Key = ", tostring(key))
                         print("Value = ", tostring(value))
 
@@ -670,16 +670,20 @@ ESPManager = {} do
                     AssignOptions("Settings.RefreshRate", {"RefreshRate"})
                     AssignToggle("Settings.TeamColor", {"TeamColor"}, function()
                         if (Toggles["Settings.TeamCheck"].Value) then
-                            Toggles["Settings.TeamCheck"]:SetValue(false)
-                            task.wait()
-                            Toggles["Settings.TeamColor"]:SetValue(true)
+                            coroutine.wrap(function()
+                                Toggles["Settings.TeamCheck"]:SetValue(false)
+                                task.wait()
+                                Toggles["Settings.TeamColor"]:SetValue(true)
+                            end)()
                         end
                     end)
                     AssignToggle("Settings.TeamCheck", {"TeamCheck"}, function()
                         if (Toggles["Settings.TeamColor"].Value) then
-                            Toggles["Settings.TeamColor"]:SetValue(false)
-                            task.wait()
-                            Toggles["Settings.TeamCheck"]:SetValue(true)
+                            coroutine.wrap(function()
+                                Toggles["Settings.TeamColor"]:SetValue(false)
+                                task.wait()
+                                Toggles["Settings.TeamCheck"]:SetValue(true)
+                            end)()
                         end
                     end)
                     AssignToggle("Settings.VisibleCheck", {"VisibleCheck"})
@@ -749,11 +753,12 @@ ESPManager = {} do
                     AssignToggle("Settings.Boxes.Show", {"Boxes", "Show"})
                     AssignOptions("Settings.Boxes.Mode", {"Boxes", "Mode"}, function()
                         print("Boxes Mode Changed")
+                        print(Options["Settings.Boxes.Mode"].Value)
                         if (Options["Settings.Boxes.Mode"].Value == 1) then
                             ESPManager:RemoveAllStaticBox()
-                            print("Boxes Mode Changed")
+                            print("Removed All Static Box")
                         else
-                            print("Remove Dynamic Box")
+                            print("Removed All Dynamic Box")
                         end
                     end)
                     AssignOptions("Settings.Boxes.FillColor", {"Boxes", "FillColor"})
