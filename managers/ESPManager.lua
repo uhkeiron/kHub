@@ -204,7 +204,7 @@ ESPManager = {} do
         local Settings = ESPManager.Settings
 
         function ESPManager:SetLibrary(library)
-            self.Library = library
+            ESPManager.Library = library
         end
 
         do -- Instances Functions
@@ -226,10 +226,26 @@ ESPManager = {} do
                     }
                 }
     
-                if (self.IsQuadSupported) then
+                if (ESPManager.IsQuadSupported) then
                     Box["Fill"] = NewDrawing("Quad", properties.Fill)
                     Box["Outline"] = NewDrawing("Quad", properties.Outline)
                 else
+                    Box = {
+                        Type = "StaticBox",
+                        ["Fill"] = {
+                            ["TopLeft"] = nil,
+                            ["TopRight"] = nil,
+                            ["BottomLeft"] = nil,
+                            ["BottomRight"] = nil
+                        },
+                        ["Outline"] = {
+                            ["TopLeft"] = nil,
+                            ["TopRight"] = nil,
+                            ["BottomLeft"] = nil,
+                            ["BottomRight"] = nil
+                        }
+                    }
+
                     Box["Fill"]["TopLeft"] = NewDrawing("Line", properties.Fill)
                     Box["Fill"]["TopRight"] = NewDrawing("Line", properties.Fill)
                     Box["Fill"]["BottomLeft"] = NewDrawing("Line", properties.Fill)
@@ -285,7 +301,7 @@ ESPManager = {} do
     
                         if (ESPManager.IsQuadSupported) then
                             local function Update(quadType)
-                                local QuadBox = self[quadType]
+                                local QuadBox = Box[quadType]
         
                                 QuadBox.Visible = true
                                 QuadBox.PointA = Vector2.new(topLeftPos.X, topLeftPos.Y)
@@ -312,8 +328,8 @@ ESPManager = {} do
                             visibleBR = bottomRightPos > 0
                             
                             local function Update(visiblePos, corner, fromto)
-                                local LineFill = self["Fill"][corner]
-                                local LineOutline = self["Outline"][corner]
+                                local LineFill = Box["Fill"][corner]
+                                local LineOutline = Box["Outline"][corner]
     
                                 if (visiblePos) then
                                     LineFill.Visible = true
@@ -359,7 +375,7 @@ ESPManager = {} do
     
                     function Box:SetVisibility(boolean)
                         local function UpdateUnQuad(lineType)
-                            for key, _ in pairs(self[lineType]) do
+                            for key, _ in pairs(Box[lineType]) do
                                 key["TopLeft"].Visible = boolean
                                 key["TopRight"].Visible = boolean
                                 key["BottomLeft"].Visible = boolean
@@ -368,8 +384,8 @@ ESPManager = {} do
                         end
     
                         if (ESPManager.IsQuadSupported) then
-                            self["Fill"].Visible = boolean
-                            self["Outline"].Visible = boolean
+                            Box["Fill"].Visible = boolean
+                            Box["Outline"].Visible = boolean
                         else
                             UpdateUnQuad("Fill")
                             UpdateUnQuad("Outline")
@@ -377,10 +393,10 @@ ESPManager = {} do
                     end
     
                     function Box:Remove()
-                        self:SetVisibility(false)
+                        Box:SetVisibility(false)
     
                         local function UpdateUnQuad(lineType)
-                            for key, _ in pairs(self[lineType]) do
+                            for key, _ in pairs(Box[lineType]) do
                                 key["TopLeft"]:Remove()
                                 key["TopRight"]:Remove()
                                 key["BottomLeft"]:Remove()
@@ -389,8 +405,8 @@ ESPManager = {} do
                         end
     
                         if (ESPManager.IsQuadSupported) then
-                            self["Fill"]:Remove()
-                            self["Outline"]:Remove()
+                            Box["Fill"]:Remove()
+                            Box["Outline"]:Remove()
                         else
                             UpdateUnQuad("Fill")
                             UpdateUnQuad("Outline")
@@ -565,7 +581,7 @@ ESPManager = {} do
         end
 
         function ESPManager:CreateESPManager(Tab)
-            assert(self.Library, "You must set ESPManager.Library first before doing this")
+            assert(ESPManager.Library, "You must set ESPManager.Library first before doing this")
 
             local Groupboxes = {
                 MainBox = Tab:AddLeftGroupbox("Main"),
