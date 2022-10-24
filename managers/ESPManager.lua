@@ -208,7 +208,7 @@ ESPManager = {} do
         end
 
         function ESPManager:CreateStaticBox()
-            local Box = {Type = "StaticBox"}
+            local Box = {}
 
             local properties = {
                 Fill = {
@@ -406,10 +406,13 @@ ESPManager = {} do
             for playerName, instancesTable in pairs(ESPManager.InstanceData) do
                 if not (ESPManager.InstanceData[playerName].DontDelete) then
                     for key, value in pairs(instancesTable) do
+                        print(tostring(key))
+                        print(tostring(value))
+
                         if (value.Type == "StaticBox") then
                             print("Found a StaticBox")
 
-                            value.Visible = false
+                            value:SetVisibility(false)
                             value:Remove()
                             instancesTable.Instances[key] = nil
                         end
@@ -662,11 +665,13 @@ ESPManager = {} do
                     AssignToggle("Settings.TeamColor", {"TeamColor"}, function()
                         if (Toggles["Settings.TeamCheck"].Value) then
                             Toggles["Settings.TeamCheck"]:SetValue(false)
+                            Toggles["Settings.TeamColor"]:SetValue(true)
                         end
                     end)
                     AssignToggle("Settings.TeamCheck", {"TeamCheck"}, function()
                         if (Toggles["Settings.TeamColor"].Value) then
                             Toggles["Settings.TeamColor"]:SetValue(false)
+                            Toggles["Settings.TeamCheck"]:SetValue(true)
                         end
                     end)
                     AssignToggle("Settings.VisibleCheck", {"VisibleCheck"})
@@ -735,8 +740,12 @@ ESPManager = {} do
                 do
                     AssignToggle("Settings.Boxes.Show", {"Boxes", "Show"})
                     AssignOptions("Settings.Boxes.Mode", {"Boxes", "Mode"}, function()
+                        print("Boxes Mode Changed")
                         if (Options["Settings.Boxes.Mode"].Value == 1) then
                             ESPManager:RemoveAllStaticBox()
+                            print("Boxes Mode Changed")
+                        else
+                            print("Remove Dynamic Box")
                         end
                     end)
                     AssignOptions("Settings.Boxes.FillColor", {"Boxes", "FillColor"})
