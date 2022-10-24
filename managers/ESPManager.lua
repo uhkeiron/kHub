@@ -212,7 +212,6 @@ ESPManager = {} do
             ShowMyself = false,
             Boxes = {
                 Show = true,
-                Mode = 2,
                 UseQuad = true,
                 FillColor = Color3.fromRGB(207, 0, 0),
                 FillThickness = 3,
@@ -244,8 +243,8 @@ ESPManager = {} do
         end
 
         do -- Instances Functions
-            function ESPManager:CreateStaticBox()
-                local Box = {Type = "StaticBox"}
+            function ESPManager:CreateBox()
+                local Box = {Type = "Box"}
     
                 local properties = {
                     Fill = {
@@ -268,7 +267,7 @@ ESPManager = {} do
                     Box["Outline"] = NewDrawing("Quad", properties.Outline)
                 else
                     Box = {
-                        Type = "StaticBox",
+                        Type = "Box",
                         ["Fill"] = {
                             ["TopLeft"] = nil,
                             ["TopRight"] = nil,
@@ -458,12 +457,12 @@ ESPManager = {} do
                 return Box
             end
             
-            function ESPManager:RemoveStaticBox(player)
+            function ESPManager:RemoveBox(player)
                 for playerName, instancesTable in pairs(ESPManager.InstanceData) do
                     if not (ESPManager.InstanceData[playerName].DontDelete) then
                         if (player) and (player.Name == playerName) then
                             for key, value in pairs(instancesTable.Instances) do
-                                if (value.Type == "StaticBox") then
+                                if (value.Type == "Box") then
                                     value:SetVisibility(false)
                                     value:Remove()
                                     instancesTable.Instances[key] = nil
@@ -471,199 +470,7 @@ ESPManager = {} do
                             end
                         elseif not (player) then
                             for key, value in pairs(instancesTable.Instances) do
-                                if (value.Type == "StaticBox") then
-                                    value:SetVisibility(false)
-                                    value:Remove()
-                                    instancesTable.Instances[key] = nil
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-
-            function ESPManager:CreateDynamicBox()
-                local Box = {Type = "DynamicBox"}
-
-                local properties = {
-                    Fill = {
-                        Visible = true,
-                        ZIndex = 50,
-                        Transparency = Settings.Boxes.FillTransparency,
-                        Color = Settings.Boxes.FillColor,
-                        Thickness = Settings.Boxes.FillThickness
-                    },
-                    Outline = {
-                        Visible = true,
-                        Transparency = Settings.Boxes.OutlineTransparency,
-                        Color = Settings.Boxes.OutlineColor,
-                        Thickness = Settings.Boxes.OutlineThickness
-                    }
-                }
-
-                Box["Fill"] = NewDrawing("Square", properties.Fill)
-                Box["Outline"] = NewDrawing("Square", properties.Outline)
-
-                do
-                    function Box:Update(CF, size, player, parts)
-                        if not (CF) or not (size) or not (player) or not (parts) then
-                            return
-                        end
-
-                        local everyCorners = {}
-
-                        for _, v in pairs(parts) do
-                            local CF, size = v.CFrame, v.size
-
-                            local corners = {
-                                Vector3.new(CF.X + size.X / 2, CF.Y + size.Y / 2, CF.Z + size.Z / 2),
-                                Vector3.new(CF.X - size.X / 2, CF.Y + size.Y / 2, CF.Z + size.Z / 2),
-                                Vector3.new(CF.X - size.X / 2, CF.Y - size.Y / 2, CF.Z - size.Z / 2),
-                                Vector3.new(CF.X + size.X / 2, CF.Y - size.Y / 2, CF.Z - size.Z / 2),
-                                Vector3.new(CF.X - size.X / 2, CF.Y + size.Y / 2, CF.Z - size.Z / 2),
-                                Vector3.new(CF.X + size.X / 2, CF.Y + size.Y / 2, CF.Z - size.Z / 2),
-                                Vector3.new(CF.X - size.X / 2, CF.Y - size.Y / 2, CF.Z + size.Z / 2),
-                                Vector3.new(CF.X + size.X / 2, CF.Y - size.Y / 2, CF.Z + size.Z / 2)
-                            }
-
-                            for _, v in ipairs(corners) do
-                                table.insert(everyCorners, v)
-                            end
-
-                            corners = {}
-                        end
-
-                        local Min = {
-                            X = CurrentCamera.ViewportSize.X,
-                            Y = CurrentCamera.ViewportSize.Y
-                        }
-                        local Max = {
-                            X = 0,
-                            Y = 0
-                        }
-
-                        local visible = true
-
-                        local function UpdateMinMax(dimension, position)
-                            local oMin = Min[dimension]
-                            local oMax = Min[dimension]
-                            local positionO = position[dimension]
-
-                            if (positionO < oMin) then
-                                oMin = positionO
-                            end
-                            if (positionO > oMax) then
-                                oMax = positionO
-                            end
-                        end
-
-                        for _, v in ipairs(everyCorners) do
-                            local position, _visible = CurrentCamera:WorldToViewportPoint(v)
-
-                            if (visible) and not (_visible) then
-                                visible = false
-                                break
-                            end
-
-                            UpdateMinMax("X", position)
-                            UpdateMinMax("Y", position)
-                        end
-
-                        local xSize, ySize = Max.X - Min.X, Max.Y - Min.Y
-
-                        local Fill = Box["Fill"]
-                        local Outline = Box["Outline"]
-
-                        local _properties = {
-                            ["Fill"] = {
-                                ZIndex = 50,
-                                Transparency = Settings.Boxes.FillTransparency,
-                                Color = Color3.fromRGB(255, 255, 255),
-                                Thickness = Settings.Boxes.FillThickness
-                            },
-                            ["Outline"] = {
-                                Transparency = Settings.Boxes.OutlineTransparency,
-                                Color = Settings.Boxes.OutlineColor,
-                                Thickness = Settings.Boxes.OutlineThickness
-                            }
-                        }
-
-                        do
-                            if (Settings.TeamCheck) then
-                                if (CheckTeam(player)) then
-                                    _properties.Fill.Color = Color3.fromRGB(0, 255, 0)
-                                else
-                                    _properties.Fill.Color = Color3.fromRGB(255, 0, 0)
-                                end
-                            elseif (Settings.TeamColor) then
-                                if (player.TeamColor.Color) then
-                                    _properties.Fill.Color = player.TeamColor.Color
-                                end
-                            elseif not (Settings.TeamCheck) and not (Settings.TeamColor) then
-                                _properties.Fill.Color = Settings.Boxes.FillColor
-                            end
-                        end
-
-                        local function Update(squareType)
-                            local SquareBox = Box[squareType]
-    
-                            SquareBox.Visible = true
-                            SquareBox.Position = Vector2.new(Min.X, Min.Y)
-                            SquareBox.Size = Vector2.new(xSize, ySize)
-    
-                            for property, value in pairs(_properties[squareType]) do
-                                SquareBox[property] = value
-                            end
-                        end
-
-                        Update("Fill")
-                        Update("Outline")
-
-                        parts = {}
-                        everyCorners = {}
-                        _properties = {}
-                        Min = {}
-                        Max = {}
-                    end
-
-                    function Box:SetVisibility(boolean)
-                        if (Box["Fill"]) and (Box["Outline"]) then
-                            Box["Fill"].Visible = boolean
-                            Box["Outline"].Visible = boolean
-                        end
-                    end
-
-                    function Box:Remove()
-                        Box:SetVisibility(false)
-
-                        if (Box["Fill"]) and (Box["Outline"]) then
-                            Box["Fill"]:Remove()
-                            Box["Outline"]:Remove()
-                        end
-
-                        Box = {}
-                    end
-                end
-
-                properties = {}
-
-                return Box
-            end
-
-            function ESPManager:RemoveDynamicBox(player)
-                for playerName, instancesTable in pairs(ESPManager.InstanceData) do
-                    if not (ESPManager.InstanceData[playerName].DontDelete) then
-                        if (player) and (player.Name == playerName) then
-                            for key, value in pairs(instancesTable.Instances) do
-                                if (value.Type == "DynamicBox") then
-                                    value:SetVisibility(false)
-                                    value:Remove()
-                                    instancesTable.Instances[key] = nil
-                                end
-                            end
-                        elseif not (player) then
-                            for key, value in pairs(instancesTable.Instances) do
-                                if (value.Type == "DynamicBox") then
+                                if (value.Type == "Box") then
                                     value:SetVisibility(false)
                                     value:Remove()
                                     instancesTable.Instances[key] = nil
@@ -822,11 +629,8 @@ ESPManager = {} do
 
                     local data = ESPManager.InstanceData[player.Name] or {Instances = {}}
 
-                    if (Settings.Boxes.Mode == "Dynamic") then
-                        data.Instances["Box"] = data.Instances["Box"] or ESPManager:CreateDynamicBox()
-                    else
-                        data.Instances["Box"] = data.Instances["Box"] or ESPManager:CreateStaticBox()
-                    end
+
+                    data.Instances["Box"] = data.Instances["Box"] or ESPManager:CreateBox()
 
                     data.Instances["Cham"] = data.Instances["Cham"] or ESPManager:CreateCham()
 
@@ -1084,9 +888,8 @@ ESPManager = {} do
                     AssignToggle("Settings.VisibleCheck", {"VisibleCheck"})
                     AssignToggle("Settings.ShowMyself", {"ShowMyself"}, function()
                         if not (Toggles["Settings.ShowMyself"].Value) then
-                            ESPManager:RemoveStaticBox(LocalPlayer)
+                            ESPManager:RemoveBox(LocalPlayer)
                             ESPManager:RemoveCham(LocalPlayer)
-                            ESPManager:RemoveDynamicBox(LocalPlayer)
                         end
                     end)
                 end
@@ -1103,18 +906,11 @@ ESPManager = {} do
                     Default = Settings.Boxes.Show,
                     Tooltip = "Enable it to show boxes type esp."
                 })
-                Groupbox:AddDropdown("Settings.Boxes.Mode", {
-                    Text = "Drawing Mode",
-                    Default = Settings.Boxes.Mode,
-                    Values = {"Dynamic", "Static"},
-                    Multi = false,
-                    Tooltip = "Dynamic for dynamic box type or Static for static box type."
-                })
                 if (ESPManager.IsQuadSupported) then
                     Groupbox:AddToggle("Settings.Boxes.UseQuad", {
                         Text = "Use Drawing Quad",
                         Default = Settings.Boxes.UseQuad,
-                        Tooltip = "Enable it to use Drawing.new(\"Quad\") instead of Drawing.new(\"Line\"). (Only works if you use Static Mode)"
+                        Tooltip = "Enable it to use Drawing.new(\"Quad\") instead of Drawing.new(\"Line\")."
                     })
                 end
                 Groupbox:AddLabel("Fill Color"):AddColorPicker("Settings.Boxes.FillColor", {
@@ -1160,19 +956,10 @@ ESPManager = {} do
 
                 do
                     AssignToggle("Settings.Boxes.Show", {"Boxes", "Show"})
-                    AssignOptions("Settings.Boxes.Mode", {"Boxes", "Mode"}, function()
-                        if (Options["Settings.Boxes.Mode"].Value == "Dynamic") then
-                            ESPManager:RemoveStaticBox()
-                        elseif (Options["Settings.Boxes.Mode"].Value == "Static") then
-                            ESPManager:RemoveDynamicBox()
-                        end
-                    end)
                     if (ESPManager.IsQuadSupported) then
                         AssignToggle("Settings.Boxes.UseQuad", {"Boxes", "UseQuad"}, function()
-                            if (Options["Settings.Boxes.Mode"].Value == "Static") then
-                                ESPManager:RemoveStaticBox()
-                                ESPManager.IsQuadSupported = Toggles["Settings.Boxes.UseQuad"].Value
-                            end
+                            ESPManager:RemoveBox()
+                            ESPManager.IsQuadSupported = Toggles["Settings.Boxes.UseQuad"].Value
                         end)
                     end
                     AssignOptions("Settings.Boxes.FillColor", {"Boxes", "FillColor"})
