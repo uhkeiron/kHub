@@ -72,9 +72,15 @@ local function NewInstance(instanceType, properties)
 
     if (typeof(properties) == "table") then
         for property, value in pairs(properties) do
-            Instance[property] = value
+            if (tostring(property) ~= "Parent") then
+                Instance[property] = value
+            end
         end
+
+        Instance.Parent = properties.Parent
     end
+
+    return Instance
 end
 
 local function GetCharacter(player)
