@@ -401,10 +401,14 @@ ESPManager = {} do
         end
 
         function ESPManager:RemoveAllStaticBox()
+            print("ESPManager:RemoveAllStaticBox() called")
+
             for playerName, instancesTable in pairs(ESPManager.InstanceData) do
                 if not (ESPManager.InstanceData[playerName].DontDelete) then
                     for key, value in pairs(instancesTable) do
                         if (value.Type == "StaticBox") then
+                            print("Found a StaticBox")
+
                             value.Visible = false
                             value:Remove()
                             instancesTable.Instances[key] = nil
@@ -431,7 +435,14 @@ ESPManager = {} do
                 for _, player in pairs(PlayersService:GetPlayers()) do
                     local data = ESPManager.InstanceData[player.Name] or {Instances = {}}
 
-                    data.Instances["Box"] = data.Instances["Box"] or (if (ESPManager.Settings.Boxes.Mode == 1) then print("DynamicBox") else ESPManager:CreateStaticBox())
+                    if (ESPManager.Settings.Boxes.Mode == 1) then
+                        print("DynamicBox")
+                        --data.Instances["Box"] = data.Instances["Box"] or "DynamicBox"
+                    else
+                        data.Instances["Box"] = data.Instances["Box"] or ESPManager:CreateStaticBox()
+                    end
+
+                    --data.Instances["Box"] = data.Instances["Box"] or (if (ESPManager.Settings.Boxes.Mode == 1) then print("DynamicBox") else ESPManager:CreateStaticBox())
 
                     local Box = data.Instances["Box"]
 

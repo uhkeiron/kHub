@@ -28,6 +28,6 @@ local Tabs = {
 Tabs["ESP"].Groupboxes = GUIManager:BuildESP(Tabs["ESP"].Tab)
 Tabs["Settings"].Tab = GUIManager:BuildSettings(Window, "Universal")
 GUIManager:SetUnloadFunction(function()
-    task.wait(.21)
     GUIManager.AscHubESPManager:UnbindFromRenderStep()
+    GUIManager.AscHubESPManager:RemoveAllStaticBox()
 end)
