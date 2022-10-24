@@ -207,219 +207,209 @@ ESPManager = {} do
             self.Library = library
         end
 
-        function ESPManager:CreateStaticBox()
-            local Box = {Type = "StaticBox"}
-
-            local properties = {
-                Fill = {
-                    Visible = true,
-                    Transparency = Settings.Boxes.FillTransparency,
-                    Color = Settings.Boxes.FillColor,
-                    Thickness = Settings.Boxes.FillThickness
-                },
-                Outline = {
-                    Visible = true,
-                    Transparency = Settings.Boxes.OutlineTransparency,
-                    Color = Settings.Boxes.OutlineColor,
-                    Thickness = Settings.Boxes.OutlineThickness
-                }
-            }
-
-            if (self.IsQuadSupported) then
-                Box["Fill"] = NewDrawing("Quad", properties.Fill)
-                Box["Outline"] = NewDrawing("Quad", properties.Outline)
-            else
-                Box["Fill"]["TopLeft"] = NewDrawing("Line", properties.Fill)
-                Box["Fill"]["TopRight"] = NewDrawing("Line", properties.Fill)
-                Box["Fill"]["BottomLeft"] = NewDrawing("Line", properties.Fill)
-                Box["Fill"]["BottomRight"] = NewDrawing("Line", properties.Fill)
-
-                Box["Outline"]["TopLeft"] = NewDrawing("Line", properties.Outline)
-                Box["Outline"]["TopRight"] = NewDrawing("Line", properties.Outline)
-                Box["Outline"]["BottomLeft"] = NewDrawing("Line", properties.Outline)
-                Box["Outline"]["BottomRight"] = NewDrawing("Line", properties.Outline)
-            end
-            
-            do
-                function Box:Update(CF, size, player)
-                    if not (CF) and not (size) and not (player) then
-                        return
-                    end
-
-                    local topLeftPos, visibleTL = CurrentCamera:WorldToViewportPoint((CF * CFrame.new(size.X, size.Y, 0)).Position)
-                    local topRightPos, visibleTR = CurrentCamera:WorldToViewportPoint((CF * CFrame.new(-size.X, size.Y, 0)).Position)
-                    local bottomLeftPos, visibleBL = CurrentCamera:WorldToViewportPoint((CF * CFrame.new(size.X, -size.Y, 0)).Position)
-                    local bottomRightPos, visibleBR = CurrentCamera:WorldToViewportPoint((CF * CFrame.new(-size.X, -size.Y, 0)).Position)
-
-                    local _properties = {
-                        ["Fill"] = {
-                            Transparency = Settings.Boxes.FillTransparency,
-                            Color = Color3.fromRGB(255, 255, 255),
-                            Thickness = Settings.Boxes.FillThickness
-                        },
-                        ["Outline"] = {
-                            Transparency = Settings.Boxes.OutlineTransparency,
-                            Color = Settings.Boxes.OutlineColor,
-                            Thickness = Settings.Boxes.OutlineThickness
-                        }
+        do -- Instances Functions
+            function ESPManager:CreateStaticBox()
+                local Box = {Type = "StaticBox"}
+    
+                local properties = {
+                    Fill = {
+                        Visible = true,
+                        Transparency = Settings.Boxes.FillTransparency,
+                        Color = Settings.Boxes.FillColor,
+                        Thickness = Settings.Boxes.FillThickness
+                    },
+                    Outline = {
+                        Visible = true,
+                        Transparency = Settings.Boxes.OutlineTransparency,
+                        Color = Settings.Boxes.OutlineColor,
+                        Thickness = Settings.Boxes.OutlineThickness
                     }
-
-                    do
-                        if (Settings.TeamCheck) then
-                            if (CheckTeam(player)) then
-                                _properties.Fill.Color = Color3.fromRGB(0, 255, 0)
-                            else
-                                _properties.Fill.Color = Color3.fromRGB(0, 255, 0)
-                            end
-                        elseif (Settings.TeamColor) then
-                            if (player.TeamColor.Color) then
-                                _properties.Fill.Color = player.TeamColor.Color
-                            end
-                        elseif not (Settings.TeamCheck) and not (Settings.TeamColor) then
-                            _properties.Fill.Color = Settings.Boxes.FillColor
-                        end
-                    end
-
-                    
-
-                    if (ESPManager.IsQuadSupported) then
-                        local function Update(quadType)
-                            local QuadBox = self[quadType]
+                }
     
-                            QuadBox.Visible = true
-                            QuadBox.PointA = Vector2.new(topLeftPos.X, topLeftPos.Y)
-                            QuadBox.PointB = Vector2.new(topRightPos.X, topRightPos.Y)
-                            QuadBox.PointC = Vector2.new(bottomRightPos.X, bottomRightPos.Y)
-                            QuadBox.PointD = Vector2.new(bottomLeftPos.X, bottomLeftPos.Y)
+                if (self.IsQuadSupported) then
+                    Box["Fill"] = NewDrawing("Quad", properties.Fill)
+                    Box["Outline"] = NewDrawing("Quad", properties.Outline)
+                else
+                    Box["Fill"]["TopLeft"] = NewDrawing("Line", properties.Fill)
+                    Box["Fill"]["TopRight"] = NewDrawing("Line", properties.Fill)
+                    Box["Fill"]["BottomLeft"] = NewDrawing("Line", properties.Fill)
+                    Box["Fill"]["BottomRight"] = NewDrawing("Line", properties.Fill)
     
-                            for property, value in pairs(_properties[quadType]) do
-                                QuadBox[property] = value
+                    Box["Outline"]["TopLeft"] = NewDrawing("Line", properties.Outline)
+                    Box["Outline"]["TopRight"] = NewDrawing("Line", properties.Outline)
+                    Box["Outline"]["BottomLeft"] = NewDrawing("Line", properties.Outline)
+                    Box["Outline"]["BottomRight"] = NewDrawing("Line", properties.Outline)
+                end
+                
+                do
+                    function Box:Update(CF, size, player)
+                        if not (CF) and not (size) and not (player) then
+                            return
+                        end
+    
+                        local topLeftPos, visibleTL = CurrentCamera:WorldToViewportPoint((CF * CFrame.new(size.X, size.Y, 0)).Position)
+                        local topRightPos, visibleTR = CurrentCamera:WorldToViewportPoint((CF * CFrame.new(-size.X, size.Y, 0)).Position)
+                        local bottomLeftPos, visibleBL = CurrentCamera:WorldToViewportPoint((CF * CFrame.new(size.X, -size.Y, 0)).Position)
+                        local bottomRightPos, visibleBR = CurrentCamera:WorldToViewportPoint((CF * CFrame.new(-size.X, -size.Y, 0)).Position)
+    
+                        local _properties = {
+                            ["Fill"] = {
+                                Transparency = Settings.Boxes.FillTransparency,
+                                Color = Color3.fromRGB(255, 255, 255),
+                                Thickness = Settings.Boxes.FillThickness
+                            },
+                            ["Outline"] = {
+                                Transparency = Settings.Boxes.OutlineTransparency,
+                                Color = Settings.Boxes.OutlineColor,
+                                Thickness = Settings.Boxes.OutlineThickness
+                            }
+                        }
+    
+                        do
+                            if (Settings.TeamCheck) then
+                                if (CheckTeam(player)) then
+                                    _properties.Fill.Color = Color3.fromRGB(0, 255, 0)
+                                else
+                                    _properties.Fill.Color = Color3.fromRGB(0, 255, 0)
+                                end
+                            elseif (Settings.TeamColor) then
+                                if (player.TeamColor.Color) then
+                                    _properties.Fill.Color = player.TeamColor.Color
+                                end
+                            elseif not (Settings.TeamCheck) and not (Settings.TeamColor) then
+                                _properties.Fill.Color = Settings.Boxes.FillColor
                             end
                         end
-
-                        if (visibleTL) and (visibleTR) and (visibleBL) and (visibleBR) then
-                            Update("Fill")
-                            Update("Outline")
-                        else
-                            Box["Fill"].Visible = false
-                            Box["Outline"].Visible = false
-                        end
-                    else
-                        visibleTL = topLeftPos > 0
-                        visibleTR = topRightPos > 0
-                        visibleBL = bottomLeftPos > 0
-                        visibleBR = bottomRightPos > 0
+    
                         
-                        local function Update(visiblePos, corner, fromto)
-                            local LineFill = self["Fill"][corner]
-                            local LineOutline = self["Outline"][corner]
-
-                            if (visiblePos) then
-                                LineFill.Visible = true
-                                LineFill.From = fromto[1]
-                                LineFill.To = fromto[2]
-
-                                LineOutline.Visible = true
-                                LineOutline.From = fromto[1]
-                                LineFill.To = fromto[2]
-
-                                for property, value in pairs(_properties["Fill"]) do
-                                    LineFill[property] = value
+    
+                        if (ESPManager.IsQuadSupported) then
+                            local function Update(quadType)
+                                local QuadBox = self[quadType]
+        
+                                QuadBox.Visible = true
+                                QuadBox.PointA = Vector2.new(topLeftPos.X, topLeftPos.Y)
+                                QuadBox.PointB = Vector2.new(topRightPos.X, topRightPos.Y)
+                                QuadBox.PointC = Vector2.new(bottomRightPos.X, bottomRightPos.Y)
+                                QuadBox.PointD = Vector2.new(bottomLeftPos.X, bottomLeftPos.Y)
+        
+                                for property, value in pairs(_properties[quadType]) do
+                                    QuadBox[property] = value
                                 end
-
-                                for property, value in pairs(_properties["Outline"]) do
-                                    LineOutline[property] = value
-                                end
-
+                            end
+    
+                            if (visibleTL) and (visibleTR) and (visibleBL) and (visibleBR) then
+                                Update("Fill")
+                                Update("Outline")
                             else
-                                LineFill.Visible = false
-                                LineOutline.Visible = false
+                                Box["Fill"].Visible = false
+                                Box["Outline"].Visible = false
+                            end
+                        else
+                            visibleTL = topLeftPos > 0
+                            visibleTR = topRightPos > 0
+                            visibleBL = bottomLeftPos > 0
+                            visibleBR = bottomRightPos > 0
+                            
+                            local function Update(visiblePos, corner, fromto)
+                                local LineFill = self["Fill"][corner]
+                                local LineOutline = self["Outline"][corner]
+    
+                                if (visiblePos) then
+                                    LineFill.Visible = true
+                                    LineFill.From = fromto[1]
+                                    LineFill.To = fromto[2]
+    
+                                    LineOutline.Visible = true
+                                    LineOutline.From = fromto[1]
+                                    LineFill.To = fromto[2]
+    
+                                    for property, value in pairs(_properties["Fill"]) do
+                                        LineFill[property] = value
+                                    end
+    
+                                    for property, value in pairs(_properties["Outline"]) do
+                                        LineOutline[property] = value
+                                    end
+    
+                                else
+                                    LineFill.Visible = false
+                                    LineOutline.Visible = false
+                                end
+                            end
+    
+                            Update(visibleTL, "TopLeft", {
+                                Vector2.new(topLeftPos.X, topLeftPos.Y),
+                                Vector2.new(topRightPos.X, topRightPos.Y)
+                            })
+                            Update(visibleTR, "TopRight", {
+                                Vector2.new(topRightPos.X, topRightPos.Y),
+                                Vector2.new(bottomRightPos.X, bottomRightPos.Y)
+                            })
+                            Update(visibleBL, "BottomLeft", {
+                                Vector2.new(bottomLeftPos.X, bottomLeftPos.Y),
+                                Vector2.new(topLeftPos.X, topLeftPos.Y)
+                            })
+                            Update(visibleBR, "BottomRight", {
+                                Vector2.new(bottomRightPos.X, bottomRightPos.Y),
+                                Vector2.new(bottomLeftPos.X, bottomLeftPos.Y)
+                            })
+                        end
+                    end
+    
+                    function Box:SetVisibility(boolean)
+                        local function UpdateUnQuad(lineType)
+                            for key, _ in pairs(self[lineType]) do
+                                key["TopLeft"].Visible = boolean
+                                key["TopRight"].Visible = boolean
+                                key["BottomLeft"].Visible = boolean
+                                key["BottomRight"].Visible = boolean
                             end
                         end
-
-                        Update(visibleTL, "TopLeft", {
-                            Vector2.new(topLeftPos.X, topLeftPos.Y),
-                            Vector2.new(topRightPos.X, topRightPos.Y)
-                        })
-                        Update(visibleTR, "TopRight", {
-                            Vector2.new(topRightPos.X, topRightPos.Y),
-                            Vector2.new(bottomRightPos.X, bottomRightPos.Y)
-                        })
-                        Update(visibleBL, "BottomLeft", {
-                            Vector2.new(bottomLeftPos.X, bottomLeftPos.Y),
-                            Vector2.new(topLeftPos.X, topLeftPos.Y)
-                        })
-                        Update(visibleBR, "BottomRight", {
-                            Vector2.new(bottomRightPos.X, bottomRightPos.Y),
-                            Vector2.new(bottomLeftPos.X, bottomLeftPos.Y)
-                        })
-                    end
-                end
-
-                function Box:SetVisibility(boolean)
-                    local function UpdateUnQuad(lineType)
-                        for key, _ in pairs(self[lineType]) do
-                            key["TopLeft"].Visible = boolean
-                            key["TopRight"].Visible = boolean
-                            key["BottomLeft"].Visible = boolean
-                            key["BottomRight"].Visible = boolean
+    
+                        if (ESPManager.IsQuadSupported) then
+                            self["Fill"].Visible = boolean
+                            self["Outline"].Visible = boolean
+                        else
+                            UpdateUnQuad("Fill")
+                            UpdateUnQuad("Outline")
                         end
                     end
-
-                    if (ESPManager.IsQuadSupported) then
-                        self["Fill"].Visible = boolean
-                        self["Outline"].Visible = boolean
-                    else
-                        UpdateUnQuad("Fill")
-                        UpdateUnQuad("Outline")
-                    end
-                end
-
-                function Box:Remove()
-                    self:SetVisibility(false)
-
-                    local function UpdateUnQuad(lineType)
-                        for key, _ in pairs(self[lineType]) do
-                            key["TopLeft"]:Remove()
-                            key["TopRight"]:Remove()
-                            key["BottomLeft"]:Remove()
-                            key["BottomRight"]:Remove()
+    
+                    function Box:Remove()
+                        self:SetVisibility(false)
+    
+                        local function UpdateUnQuad(lineType)
+                            for key, _ in pairs(self[lineType]) do
+                                key["TopLeft"]:Remove()
+                                key["TopRight"]:Remove()
+                                key["BottomLeft"]:Remove()
+                                key["BottomRight"]:Remove()
+                            end
+                        end
+    
+                        if (ESPManager.IsQuadSupported) then
+                            self["Fill"]:Remove()
+                            self["Outline"]:Remove()
+                        else
+                            UpdateUnQuad("Fill")
+                            UpdateUnQuad("Outline")
                         end
                     end
-
-                    if (ESPManager.IsQuadSupported) then
-                        self["Fill"]:Remove()
-                        self["Outline"]:Remove()
-                    else
-                        UpdateUnQuad("Fill")
-                        UpdateUnQuad("Outline")
-                    end
                 end
+    
+                return Box
             end
-
-            return Box
-        end
-
-        function ESPManager:RemoveAllStaticBox()
-            print("ESPManager:RemoveAllStaticBox() called")
-
-            for playerName, instancesTable in pairs(ESPManager.InstanceData) do
-                --warn("---------------------------------------")
-                --print("Player Name = ", tostring(playerName))
-                --print("Instances Table = ", tostring(instancesTable))
-
-                if not (ESPManager.InstanceData[playerName].DontDelete) then
-                    --print("Don't Delete = false")
-
-                    for key, value in pairs(instancesTable.Instances) do
-                        --print("Key = ", tostring(key))
-                        --print("Value = ", tostring(value))
-
-                        if (value.Type == "StaticBox") then
-                            --print("Found a StaticBox")
-                            value:SetVisibility(false)
-                            value:Remove()
-                            instancesTable.Instances[key] = nil
+    
+            function ESPManager:RemoveAllStaticBox()
+                for playerName, instancesTable in pairs(ESPManager.InstanceData) do
+                    if not (ESPManager.InstanceData[playerName].DontDelete) then
+                        for key, value in pairs(instancesTable.Instances) do
+                            if (value.Type == "StaticBox") then
+                                value:SetVisibility(false)
+                                value:Remove()
+                                instancesTable.Instances[key] = nil
+                            end
                         end
                     end
                 end
@@ -467,14 +457,10 @@ ESPManager = {} do
                     local data = ESPManager.InstanceData[player.Name] or {Instances = {}}
 
                     if (ESPManager.Settings.Boxes.Mode == "Dynamic") then
-                        print("DynamicBox")
                         data.Instances["Box"] = data.Instances["Box"] or ESPManager:CreateStaticBox()
-                        --data.Instances["Box"] = data.Instances["Box"] or "DynamicBox"
                     else
                         data.Instances["Box"] = data.Instances["Box"] or ESPManager:CreateStaticBox()
                     end
-
-                    --data.Instances["Box"] = data.Instances["Box"] or (if (ESPManager.Settings.Boxes.Mode == 1) then print("DynamicBox") else ESPManager:CreateStaticBox())
 
                     local Box = data.Instances["Box"]
 
@@ -775,14 +761,9 @@ ESPManager = {} do
                 do
                     AssignToggle("Settings.Boxes.Show", {"Boxes", "Show"})
                     AssignOptions("Settings.Boxes.Mode", {"Boxes", "Mode"}, function()
-                        --warn("-------------------")
-                        --print("Boxes Mode Changed")
-                        print(Options["Settings.Boxes.Mode"].Value)
                         if (Options["Settings.Boxes.Mode"].Value == "Dynamic") then
                             ESPManager:RemoveAllStaticBox()
-                            print("Removed All Static Box")
                         elseif (Options["Settings.Boxes.Mode"].Value == "Static") then
-                            print("Removed All Dynamic Box")
                         end
                     end)
                     AssignOptions("Settings.Boxes.FillColor", {"Boxes", "FillColor"})
