@@ -223,7 +223,7 @@ ESPManager = {} do
                 Show = true,
                 Mode = 1,
                 FillColor = Color3.fromRGB(207, 0, 0),
-                FillTransparency = 1,
+                FillTransparency = 0.3,
                 OutlineColor = Color3.fromHSV(0, 0, 0),
                 OutlineTransparency = 1
             }
@@ -654,6 +654,8 @@ ESPManager = {} do
 
                             if (Settings.Chams.Show) then
                                 Cham:Update(player, Character)
+                            else
+                                Cham:SetVisibility(false)
                             end
 
                             if (screenPosition.Z > 0) then
