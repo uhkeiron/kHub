@@ -404,26 +404,48 @@ ESPManager = {} do
             print("ESPManager:RemoveAllStaticBox() called")
 
             for playerName, instancesTable in pairs(ESPManager.InstanceData) do
-                warn("---------------------------------------")
-                print("Player Name = ", tostring(playerName))
-                print("Instances Table = ", tostring(instancesTable))
+                --warn("---------------------------------------")
+                --print("Player Name = ", tostring(playerName))
+                --print("Instances Table = ", tostring(instancesTable))
 
                 if not (ESPManager.InstanceData[playerName].DontDelete) then
-                    print("Don't Delete = false")
+                    --print("Don't Delete = false")
 
                     for key, value in pairs(instancesTable.Instances) do
-                        print("Key = ", tostring(key))
-                        print("Value = ", tostring(value))
+                        --print("Key = ", tostring(key))
+                        --print("Value = ", tostring(value))
 
                         if (value.Type == "StaticBox") then
-                            print("Found a StaticBox")
-
+                            --print("Found a StaticBox")
                             value:SetVisibility(false)
                             value:Remove()
                             instancesTable.Instances[key] = nil
                         end
                     end
                 end
+            end
+        end
+
+        function ESPManager:RemoveESP(dedicatedForLoop, playerName, instancesTable)
+            dedicatedForLoop = dedicatedForLoop or true
+
+            local function Remove(_playerName, _instancesTable)
+                if not (ESPManager.InstanceData[_playerName].DontDelete) then
+                    for key, value in pairs(_instancesTable.Instances) do
+                        value:SetVisibility(false)
+                        value:Remove()
+                        _instancesTable.Instances[key] = nil
+                    end
+                    ESPManager.InstanceData[_playerName] = nil
+                end
+            end
+
+            if (dedicatedForLoop) then
+                for _playerName, _instancesTable in pairs(ESPManager.InstanceData) do
+                    Remove(_playerName, _instancesTable)
+                end
+            else
+                Remove(playerName, instancesTable)
             end
         end
 
@@ -444,8 +466,9 @@ ESPManager = {} do
                 for _, player in pairs(PlayersService:GetPlayers()) do
                     local data = ESPManager.InstanceData[player.Name] or {Instances = {}}
 
-                    if (ESPManager.Settings.Boxes.Mode == 1) then
+                    if (ESPManager.Settings.Boxes.Mode == "Dynamic") then
                         print("DynamicBox")
+                        data.Instances["Box"] = data.Instances["Box"] or ESPManager:CreateStaticBox()
                         --data.Instances["Box"] = data.Instances["Box"] or "DynamicBox"
                     else
                         data.Instances["Box"] = data.Instances["Box"] or ESPManager:CreateStaticBox()
@@ -516,9 +539,10 @@ ESPManager = {} do
                     CurrentCamera = WorkspaceService.CurrentCamera
                 end
                 
-                -- TODO: Create a function to delete all spesific esp instances.
-                for i, value in pairs(ESPManager.InstanceData) do
-                    if not (PlayersService:FindFirstChild(tostring(i))) then
+                for playerName, instancesTable in pairs(ESPManager.InstanceData) do
+                    if not (PlayersService:FindFirstChild(tostring(playerName))) then
+                        ESPManager:RemoveESP(false, playerName, instancesTable)
+                        --[[
                         if not (ESPManager.InstanceData[i].DontDelete) then
                             table.foreach(value.Instances, function(i, object)
                                 object.Visible = false
@@ -536,6 +560,7 @@ ESPManager = {} do
                                 ESPManager.InstanceData[i] = nil
                             end
                         end
+                        ]]--
                     end
                 end
             end
@@ -657,6 +682,8 @@ ESPManager = {} do
                 })
                 
                 do
+                    local isChanging = false
+
                     AssignToggle("Settings.Enabled", {"Enabled"}, function()
                         if (Toggles["Settings.Enabled"].Value) then
                             ESPManager:BindToRenderStep()
@@ -669,21 +696,17 @@ ESPManager = {} do
                     AssignOptions("Settings.MaxDrawDistance", {"MaxDrawDistance"})
                     AssignOptions("Settings.RefreshRate", {"RefreshRate"})
                     AssignToggle("Settings.TeamColor", {"TeamColor"}, function()
-                        if (Toggles["Settings.TeamCheck"].Value) then
+                        if (Toggles["Settings.TeamCheck"].Value) and not (isChanging) then
+                            isChanging = true
                             Toggles["Settings.TeamCheck"]:SetValue(false)
-
-                            if not (Toggles["Settings.TeamColor"].Value) then
-                                Toggles["Settings.TeamColor"]:SetValue(true)
-                            end
+                            isChanging = false
                         end
                     end)
                     AssignToggle("Settings.TeamCheck", {"TeamCheck"}, function()
-                        if (Toggles["Settings.TeamColor"].Value) then
+                        if (Toggles["Settings.TeamColor"].Value) and not (isChanging) then
+                            isChanging = true
                             Toggles["Settings.TeamColor"]:SetValue(false)
-
-                            if not (Toggles["Settings.TeamCheck"].Value) then
-                                Toggles["Settings.TeamCheck"]:SetValue(true)
-                            end
+                            isChanging = false
                         end
                     end)
                     AssignToggle("Settings.VisibleCheck", {"VisibleCheck"})
@@ -752,13 +775,13 @@ ESPManager = {} do
                 do
                     AssignToggle("Settings.Boxes.Show", {"Boxes", "Show"})
                     AssignOptions("Settings.Boxes.Mode", {"Boxes", "Mode"}, function()
-                        warn("-------------------")
-                        print("Boxes Mode Changed")
+                        --warn("-------------------")
+                        --print("Boxes Mode Changed")
                         print(Options["Settings.Boxes.Mode"].Value)
-                        if (Options["Settings.Boxes.Mode"].Value == 1) then
+                        if (Options["Settings.Boxes.Mode"].Value == "Dynamic") then
                             ESPManager:RemoveAllStaticBox()
                             print("Removed All Static Box")
-                        elseif (Options["Settings.Boxes.Mode"].Value == 2) then
+                        elseif (Options["Settings.Boxes.Mode"].Value == "Static") then
                             print("Removed All Dynamic Box")
                         end
                     end)
