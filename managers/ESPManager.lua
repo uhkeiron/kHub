@@ -800,10 +800,10 @@ ESPManager = {} do
                     end)
                     if (ESPManager.IsQuadSupported) then
                         AssignToggle("Settings.Boxes.UseQuad", {"Boxes", "UseQuad"}, function()
-                            ESPManager.IsQuadSupported = Toggles["Settings.Boxes.UseQuad"].Value
                             if (Options["Settings.Boxes.Mode"].Value == "Static") then
                                 ESPManager:RemoveAllStaticBox()
                             end
+                            ESPManager.IsQuadSupported = Toggles["Settings.Boxes.UseQuad"].Value
                         end)
                     end
                     AssignOptions("Settings.Boxes.FillColor", {"Boxes", "FillColor"})
