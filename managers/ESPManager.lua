@@ -146,7 +146,7 @@ local function CheckPlayer(player)
 
     local Character = GetCharacter(player)
 
-    if (player ~= LocalPlayer) and (Character) then
+    if (Character) then
         local Head = Character:FindFirstChild("Head")
 
         if (pass) and (Character) and (Head) then
@@ -183,9 +183,11 @@ ESPManager = {} do
             TeamCheck = false,
             TeamColor = false,
             VisibleCheck = false,
+            ShowMyself = false,
             Boxes = {
                 Show = true,
                 Mode = 2,
+                UseQuad = true,
                 FillColor = Color3.fromHSV(0, 0, 1),
                 FillThickness = 1,
                 FillTransparency = 1,
@@ -298,8 +300,6 @@ ESPManager = {} do
                                 _properties.Fill.Color = Settings.Boxes.FillColor
                             end
                         end
-    
-                        
     
                         if (ESPManager.IsQuadSupported) then
                             local function Update(quadType)
@@ -468,6 +468,10 @@ ESPManager = {} do
                 end
                 ]]--
                 for _, player in pairs(PlayersService:GetPlayers()) do
+                    if not (Settings.ShowMyself) and (player == LocalPlayer) then
+                        continue
+                    end
+
                     local data = ESPManager.InstanceData[player.Name] or {Instances = {}}
 
                     if (ESPManager.Settings.Boxes.Mode == "Dynamic") then
@@ -680,6 +684,11 @@ ESPManager = {} do
                     Default = Settings.VisibleCheck,
                     Tooltip = "Enable it to"
                 })
+                Groupbox:AddToggle("Settings.ShowMyself", {
+                    Text = "Show Myself",
+                    Default = Settings.ShowMyself,
+                    Tooltip = "Enable it to show ESP to yourself."
+                })
                 
                 do
                     local isChanging = false
@@ -710,6 +719,7 @@ ESPManager = {} do
                         end
                     end)
                     AssignToggle("Settings.VisibleCheck", {"VisibleCheck"})
+                    AssignToggle("Settings.ShowMyself", {"ShowMyself"})
                 end
             end
 
@@ -731,6 +741,13 @@ ESPManager = {} do
                     Multi = false,
                     Tooltip = "Dynamic for dynamic box type or Static for static box type."
                 })
+                if (ESPManager.IsQuadSupported) then
+                    Groupbox:AddToggle("Settings.Boxes.UseQuad", {
+                        Text = "Use Drawing Quad",
+                        Default = Settings.Boxes.UseQuad,
+                        Tooltip = "Enable it to use Drawing.new(\"Quad\") instead of Drawing.new(\"Line\"). (Only works if you use Static Mode)"
+                    })
+                end
                 Groupbox:AddLabel("Fill Color"):AddColorPicker("Settings.Boxes.FillColor", {
                     Title = "Box Fill Color Picker",
                     Default = Settings.Boxes.FillColor
@@ -759,7 +776,7 @@ ESPManager = {} do
                     Text = "Outline Thickness",
                     Default = Settings.Boxes.OutlineThickness,
                     Min = 6,
-                    Max = 10,
+                    Max = 8,
                     Rounding = 1,
                     Compact = false
                 })
@@ -778,8 +795,17 @@ ESPManager = {} do
                         if (Options["Settings.Boxes.Mode"].Value == "Dynamic") then
                             ESPManager:RemoveAllStaticBox()
                         elseif (Options["Settings.Boxes.Mode"].Value == "Static") then
+
                         end
                     end)
+                    if (ESPManager.IsQuadSupported) then
+                        AssignToggle("Settings.Boxes.UseQuad", {"Boxes", "UseQuad"}, function()
+                            ESPManager.IsQuadSupported = Toggles["Settings.Boxes.UseQuad"].Value
+                            if (Options["Settings.Boxes.Mode"].Value == "Static") then
+                                ESPManager:RemoveAllStaticBox()
+                            end
+                        end)
+                    end
                     AssignOptions("Settings.Boxes.FillColor", {"Boxes", "FillColor"})
                     AssignOptions("Settings.Boxes.FillThickness", {"Boxes", "FillThickness"})
                     AssignOptions("Settings.Boxes.FillTransparency", {"Boxes", "FillTransparency"})
