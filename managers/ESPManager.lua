@@ -194,9 +194,9 @@ ESPManager = {} do
                 OutlineTransparency = .2,
             }
         }
-        ESPManager.IsQuadSupported = pcall(function()
+        ESPManager.IsQuadSupported = false --[[pcall(function()
             Drawing.new("Quad"):Remove()
-        end)
+        end)]]--
     end
 
     -- Module Functions
