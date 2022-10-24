@@ -190,8 +190,8 @@ ESPManager = {} do
                 FillThickness = 1,
                 FillTransparency = 1,
                 OutlineColor = Color3.fromHSV(0, 0, 0),
-                OutlineThickness = 4,
-                OutlineTransparency = .2,
+                OutlineThickness = 6,
+                OutlineTransparency = 1,
             }
         }
         ESPManager.IsQuadSupported = false --[[pcall(function()
@@ -758,8 +758,8 @@ ESPManager = {} do
                 Groupbox:AddSlider("Settings.Boxes.OutlineThickness", {
                     Text = "Outline Thickness",
                     Default = Settings.Boxes.OutlineThickness,
-                    Min = 1,
-                    Max = 5,
+                    Min = 6,
+                    Max = 10,
                     Rounding = 1,
                     Compact = false
                 })
@@ -767,7 +767,7 @@ ESPManager = {} do
                     Text = "Outline Transparency",
                     Default  = Settings.Boxes.OutlineTransparency,
                     Min = 0,
-                    Max = .2,
+                    Max = 1,
                     Rounding = 2,
                     Compact = false
                 })

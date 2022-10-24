@@ -3,7 +3,7 @@ local function RunAndCheckPlaceID(gameName, placeIds, func)
     placeIds = placeIds or {}
     func = func or function() end
 
-    print("Running ", gameName)
+    print("Running", gameName)
     for index, placeId in ipairs(placeIds) do
         if (placeId == 0) then
             func()
