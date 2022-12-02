@@ -19,5 +19,5 @@ end
 
 --<< Main Code >>--
 RunAndCheckPlaceID("Universal", {0}, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Ausicius/AscHub-Roblox/master/games/!universal.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/uhKeiron/kHub/master/games/!universal.lua"))()
 end)
