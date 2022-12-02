@@ -4,7 +4,7 @@ local MarketplaceService = game:GetService("MarketplaceService")
 
 
 --<< Constants >>--
-local repository = "https://raw.githubusercontent.com/Ausicius/AscHub-Roblox/master/"
+local repository = "https://raw.githubusercontent.com/uhkeiron/kHub/master/"
 local Library
 
 
